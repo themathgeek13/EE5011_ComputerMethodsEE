@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2017-08-13"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>Polynomial Interpolation (Week 1)</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+EE5011: Computer Methods in Electrical Engineering
+</h1>
+<h1 class="title">
+Polynomial Interpolation (Week 1)
+</h1>
+<h2 class="author">
+Rohan Rao, EE14B118
+</h2>
+<h1 class="Section">
+<a class="toc" name="toc-Section-1">1</a> Programming Assignment
+</h1>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.1">1.1</a> 4th Order Interpolation on <span class="formula">sin(<i>x</i> + <i>x</i><sup>2</sup>)</span> with a table of 5 points
+</h2>
+<div class="Unindented">
+<img class="embedded" src="figure_0.png" alt="figure figure_0.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+This figure shows the actual points obtained on applying the polynomial interpolation at all xx = linspace(-0.5,1.5,200).
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_1.png" alt="figure figure_1.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+This figure shows that the error is lowest at the five points in the table (xarr,yarr) and grows rapidly outside the boundary of (0,1). In general, the estimated error is greater than the actual error (pessimistic error estimate, as required).
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.2">1.2</a> 4th Order Interpolation on <span class="formula">sin(<i>x</i> + <i>x</i><sup>2</sup>)</span> with a table of 30 points
+</h2>
+<div class="Unindented">
+When doing 4th order interpolation with 30 data points, the evaluation of the function at any point in the array xx will require finding the 5 nearest points from the table for which to apply polint. This can be obtained using a general binary search technique to find the set of 5 points in <span class="formula"><i>O</i>(log<sub>2</sub><i>N</i>)</span> time, where N is the total number of data points (30).
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_2-0.png" alt="figure figure_2-0.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+The error has dropped considerably, by 3-4 orders of magnitude, both the actual error and the estimated error. Once again, in general the estimated error is larger than the actual error, which is as desired.
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_2-1.png" alt="figure figure_2-1.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+The fitted curve also shows a better fit to the data as compared to the previous case.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.3">1.3</a> Varied orders of interpolation
+</h2>
+<div class="Unindented">
+As the order of the polynomial is increased, initially the error decreases, but beyond some order, the error on the interval (0,1) drops to the machine epsilon value. This value can be obtained in <a class="URL" href="https://stackoverflow.com/questions/19141432/python-numpy-machine-epsilon">iPython</a> using <span class="formula"><i>print</i>(<i>np</i>.<i>finfo</i>(<i>float</i>).<i>eps</i>)</span> to obtain the result: <span class="formula">2.22044604925<i>e</i> − 16.</span> The values of the function beyond the interval (0,1) - extrapolation - varies wildly for larger order polynomials, and cannot be expected to be correct. This shows that lower order interpolations are generally better for fitting data, and overfitting with higher order polynomials will cause the function to overreact to minor fluctuations in the data samples.
+</div>
+<div class="Indented">
+<img class="embedded" src="err5.png" alt="figure err5.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of polint = 5.
+</div>
+<div class="Indented">
+<img class="embedded" src="err10.png" alt="figure err10.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of polint = 10. Error has reduced across the full span.
+</div>
+<div class="Indented">
+<img class="embedded" src="err15.png" alt="figure err15.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of polint=15. At this point, the error on the interval is tending to the machine epsilon value. The error outside the interval has improved thus far.
+</div>
+<div class="Indented">
+<img class="embedded" src="err20.png" alt="figure err20.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of polint=20. The error on the interval is approximately machine epsilon, but outside the interval it is worse than before.
+</div>
+<div class="Indented">
+<img class="embedded" src="err25.png" alt="figure err25.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of polint=25. The error on the interval is approx machine epsilon, but outside the interval, it is even worse.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.4">1.4</a> Varying Interpolation Order (n=3 to 20), max error
+</h2>
+<div class="Unindented">
+<img class="embedded" src="maxerror.png" alt="figure maxerror.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+It can be seen that the maximum error falls quickly from 5 to 10, but then starts to rise beyond 15. If the graph is extended from 20 to 29, it can be seen to rise much faster, leaving these errors far behind. This shows that beyond an optimum order of polint, higher orders will actually increase the error. This observation validates <b>Runge’s Phenomenon</b>, which is the problem of oscillation that occurs at the edges of an interval when using polint with higher degree polynomials over a set of equispaced interpolation points.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.5">1.5</a> Function Evaluation
+</h2>
+<div class="Unindented">
+<div class="formula">
+<i>f</i>(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator">sin(<i>π</i><i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><span class="sqrt"><span class="radical">√</span><span class="ignored">(</span><span class="root">1 − <i>x</i><sup>2</sup></span><span class="ignored">)</span></span></span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+The above function, when defined on the real numbers <span class="formula">ℝ</span>, has a domain of (-1,1) and as x tends to -1 or 1, f(x) tends to zero. The function is continuous on the defined domain of (-1,1).
+</div>
+<div class="Indented">
+<img class="embedded" src="f(X).png" alt="figure f(X).png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+It is an odd function, symmetric about the origin. If the function is defined on the complex number space <span class="formula">ℂ</span>, then a <b>removable discontinuity</b> is formed at the points +1 and -1, since the values of LHL and RHL are equal to zero at these points, but the function value is <span class="formula">±</span>infinity or undefined. The radius of convergence of a power series f centred on a point a is equal to the distance from a to the nearest point where f cannot be defined in a way that makes it holomorphic. Here, the function has singularities at +1 and -1, meaning that its power series about 0 has a radius of convergence of 1.
+</div>
+<h3 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-1.5.1">1.5.1</a> Interpolation at 1000 points for 6 digit accuracy
+</h3>
+<div class="Unindented">
+When attempting to obtain the value of the function to 6 digits of accuracy, it is necessary to have the maximum error of the order of <span class="formula">10<sup> − 7</sup>.</span> The order of interpolation required to achieve this can be checked by varying the degree passed to the polint function.
+</div>
+<div class="Indented">
+<img class="embedded" src="ord5.png" alt="figure ord5.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of interpolation=5, max error=9.64e-5
+</div>
+<div class="Indented">
+<img class="embedded" src="ord10.png" alt="figure ord10.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of interpolation=10, max error=1.62e-5
+</div>
+<div class="Indented">
+<img class="embedded" src="ord16.png" alt="figure ord16.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+Order of interpolation=16, max error=4.8e-6
+</div>
+<div class="Indented">
+Thus, only when we use all the points, we are reducing the error to the order of nearly <span class="formula">10<sup> − 7</sup></span>.
+</div>
+
+</div>
+</body>
+</html>

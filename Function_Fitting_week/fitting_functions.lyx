@@ -1,0 +1,933 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+EE5011: Fitting of Functions
+\end_layout
+
+\begin_layout Author
+Rohan Rao, EE14B118
+\end_layout
+
+\begin_layout Section
+Programming Assignment
+\end_layout
+
+\begin_layout Subsection
+The function is f(x) = 
+\begin_inset Formula $x*J_{1}(x)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import scipy.special.jn as jn
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(x):
+\end_layout
+
+\begin_layout Plain Layout
+
+	return jn(1,x)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Chebyshev form of an interpolating polynomial (for x in range [-1,1])
+ is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(x)=b_{0}T_{0}(x)+b_{1}T_{1}(x)+...+b_{N}T_{N}(x)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Since we are given data for N points 
+\begin_inset Formula $(x_{i},y_{i})$
+\end_inset
+
+ for i=0,1,2,...N, we need to determine the coefficients 
+\begin_inset Formula $b_{k}$
+\end_inset
+
+ such that 
+\begin_inset Formula $p(x_{i})=y_{i}$
+\end_inset
+
+.
+ This can be written in the form of a linear system Tb=y.
+ If the data is not contained in the interval [-1,1], it needs to be transformed
+ accordingly.
+ The final function for fitting the polynomial is below.
+ This can also be obtained by using the inbuilt np.polynomial.chebyshev.chebfit
+ function in Numpy.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def chebfit(xdata,ydata,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     n=len(xdata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     xmax=max(xdata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     xmin=min(xdata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     xdata=(2*xdata-xmax-xmin)/(xmax-xmin)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     T=np.zeros((n,n))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     T[:,0]=1
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     T[:,1]=xdata
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     for j in range(2,n):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         T[:,j]=2*xdata*T[:,j-1]-T[:,j-2]
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     b=np.dot(np.linalg.inv(T),ydata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     x=(2*x-xmax-xmin)/(xmax-xmin)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     y=np.zeros(len(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     for j in range(n):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         y=y+b[j]*cos((j-1)*arccos(x));
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return y,b
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The coefficients (semilog) plot obtained by running this on 50 points in
+ range (0,5) is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename chebfitcoeffmag.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus, the use of 15 coefficients is sufficient for obtaining an accuracy
+ of the order of 15 significant figures.
+ 
+\end_layout
+
+\begin_layout Standard
+The Chebyshev fit can be generated using the following commands:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def chebpoly(n,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     if(n==0):         
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         return 1      
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     if(n==1):         
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         return x
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return 2*x*chebpoly(n-1,x)-chebpoly(n-2,x)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def chebapproxfn(coeff,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     n=len(coeff)      
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     s=0               
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     for i in range(n):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         s+=coeff[i]*chebpoly(i,x)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return s 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The error obtained over the interval 0 < x < 5 is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename err_cheb.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Discontinuities in the above semilog graph are due to an error of exactly
+ 0.
+\end_layout
+
+\begin_layout Standard
+The error can be seen to be of the order of 
+\begin_inset Formula $10^{-14}$
+\end_inset
+
+ to 
+\begin_inset Formula $10^{-15}$
+\end_inset
+
+, approximately.
+\end_layout
+
+\begin_layout Standard
+Similarly, the chebder function from numpy.polynomial.chebyshev can be used
+ as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+dercoeff=np.polynomial.chebyshev.chebder(coeff)
+\end_layout
+
+\begin_layout Plain Layout
+
+errd=chebapproxfn(dercoeff,xdata)-xdata*jn(0,xdata)
+\end_layout
+
+\begin_layout Plain Layout
+
+semilogy(xdata,errd)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The plot is as below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename err_cheb_der.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discontinuities are due to an error of exactly zero.
+ Once again, the error is at worst, of the order of 
+\begin_inset Formula $10^{-13}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The difference of samples method, for a value of delta=0.01, gives the following
+ plot:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename diffder_err.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Changing delta to 1e-5 gives the following plot:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename diffder_errdel5.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This has an error of the order of 
+\begin_inset Formula $10^{-10}$
+\end_inset
+
+.
+ In general, using the difference of samples method when calculating the
+ derivative does not allow us to use such a small value of delta, and so
+ the error would be considerably more than obtained in the second graph.
+ Graph 1 is somewhat more reasonable, but the following shows the error
+ for delta=0.1, which is for 50 points being sampled.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename diffder_errdel1.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This error is of the order of 3 decimal places, and so is not very accurate,
+ relative to the Chebyshev derivative, which is significantly more accurate.
+\end_layout
+
+\begin_layout Subsection
+The function is f(x) = sin(x).
+\end_layout
+
+\begin_layout Standard
+Using the functions defined above, the following error plot is obtained
+ with 10 coefficients and 200 samples.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 200termsin.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The error is not uniform, it is of the form of an FIR filter with regularly
+ spaced taps.
+\end_layout
+
+\begin_layout Subsection
+Five functions
+\end_layout
+
+\begin_layout Subsubsection
+Fitting the function f(x) using 200 points in the range [-1,1] and 15 coefficien
+ts for the Chebyshev series gives the following plot:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fx_err.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The maximum error over the interval is of the order of 
+\begin_inset Formula $10^{-15}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fitting the function u(x) using 200 points in the range [-1,1] and 30 coefficien
+ts for the Chebyshev series:
+\end_layout
+
+\begin_layout Standard
+The function 
+\begin_inset Formula $u(x)=e^{-|x|}$
+\end_inset
+
+ is not easily approximated over the full interval by a single polynomial
+ set.
+ The use of 30 coefficients still gives an error of 
+\begin_inset Formula $\sim10^{-3}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename ux_30.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When considering the split intervals of [-1,0) and (0,1] we get a significantly
+ better result with just 15 coefficients for [-1,0):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename ux_15_neg.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The discontinuties are due to an error of exactly zero on a semilog plot.
+\end_layout
+
+\begin_layout Standard
+Similarly, for positive values of x, the 15 coefficient plot is below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename ux_15_pos.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This shows that splitting the function u(x) into two intervals and fitting
+ each separately correctly removes the kink in the function at x=0 and allows
+ it to be fitted properly.
+\end_layout
+
+\begin_layout Subsubsection
+Fitting the function v(x) using 200 points in the range [-1,1] and 30 coefficien
+ts for the Chebyshev series:
+\end_layout
+
+\begin_layout Standard
+The function v(x) has a branch cut discontinuity at x=-1.1, which is outside
+ the range [-1,1] but still causes the number of coefficients required to
+ increase significantly.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename vx_30.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The plot above shows that using 30 coefficients gives an error of the order
+ of 
+\begin_inset Formula $10^{-8}.$
+\end_inset
+
+ The use of 15 coefficients gives an error of the order 
+\begin_inset Formula $10^{-6}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fitting the function g(x) for different values of delta and 200 points in
+ range [-1,1]:
+\end_layout
+
+\begin_layout Standard
+For delta=0.1, 200 points are insufficient for obtaining an error of being
+ 0.1 even by taking upto 50 coefficients.
+\end_layout
+
+\begin_layout Standard
+For delta=1, about 15 terms are required for an error of order 
+\begin_inset Formula $10^{-6}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename gx_del1.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=10, a significantly smaller number of terms (N=7) is required
+ for very high accuracy:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename gx_del10.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=100, just 3 terms are necessary for such accuracy:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename gx_del100.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This shows that the smoother the function becomes over the interval, the
+ more easily it can be approximated by a Chebyshev fit.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename g(x01).png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=0.1
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename g(x1).png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=1
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename g(x10).png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=10
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename g(x100).png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=100
+\end_layout
+
+\begin_layout Subsubsection
+Fitting the function h(x) for different values of delta and 200 points in
+ range [-1,1]:
+\end_layout
+
+\begin_layout Standard
+For delta=1, with 20 coefficients:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename h(x1).png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=10, with 15 coefficients:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename h(x10).png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For delta=100, with 10 coefficients:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename h(x1000.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plotting h(x) for different values of delta shows that small values of delta
+ force the function to have sharp kinks at the edges of the interval, thus
+ requiring significantly more coefficients for the Chebyshev series to converge.
+\end_layout
+
+\begin_layout Subsection
+Fourier function fitting
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+from scipy.integrate import quad
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def f1(x,m):
+\end_layout
+
+\begin_layout Plain Layout
+
+	return f(x)*cos(m*(x+1)*np.pi/2)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def fouriercoeffs(f1,N):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     fcoeff=[]
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     for i in range(N):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         fcoeff.append(quad(f1,-1,1,args=(i))[0])
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return np.array(fcoeff)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plots of fouriercoeffs for N=100 are as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename hx_fourier.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Clearly, since h(x) is periodic, it is able to be approximated well by a
+ Fourier fit.
+ The value of delta influences how quickly the series converges, with larger
+ delta converging more quickly than small delta.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename gx_fourier.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+g(x) does not converge quickly, having well over 100 coefficients for various
+ values of delta.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename vx_fourier.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The magnitude of the coefficients of v(x) drop exponentially, but still
+ are of the order of 
+\begin_inset Formula $10^{-4}$
+\end_inset
+
+ at N=100.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fx_fourier.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The coefficients of f(x) also drop in magnitude similar to v(x).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename ux_fourier.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The coefficients of u(x) also don't quickly decay with N.
+\end_layout
+
+\end_body
+\end_document

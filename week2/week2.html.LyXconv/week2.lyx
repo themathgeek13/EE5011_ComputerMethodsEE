@@ -1,0 +1,840 @@
+#LyX file created by tex2lyx 2.0.8.1
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+% This file was converted from HTML to LaTeX with
+% gnuhtml2latex program
+% (c) Tomasz Wegrzanowski <maniek@beer.com> 1999
+% (c) Gunnar Wolf <gwolf@gwolf.org> 2005-2010
+% Version : 0.4.
+
+
+\end_preamble
+\use_default_options false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\paperfontsize default
+\spacing single
+\use_hyperref 0
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 0
+\use_mathdots 0
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section*
+
+ EE5011: Computer Methods in Electrical Engineering 
+\end_layout
+
+\begin_layout Section*
+
+ Spline Interpolation (Week 2) 
+\end_layout
+
+\begin_layout Subsection*
+
+ Rohan Rao, EE14B118 
+\end_layout
+
+\begin_layout Section*
+
+ 1âProgramming Assignment 
+\end_layout
+
+\begin_layout Standard
+
+
+\shape italic
+f
+\shape default
+(
+\shape italic
+x
+\shape default
+)â=â(
+\shape italic
+x
+\shape default
+1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+))/(â((1âââ
+\shape italic
+x
+\shape default
+)(1â+â100
+\shape italic
+x
+\shape default
+2)))
+\end_layout
+
+\begin_layout Subsection*
+
+ 1.1âCreate a table of values 
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\end_inset
+
+def f(x): num=pow(x,1+special.jn(0,x)) densqr=(1+100*x*x)*(1-x) den=sqrt(densqr) return num/den â x=arange(0.1,0.95,0.05) #generates a set of points with spacing of 0.05 in the range of 0.1 and 0.9 y=f(x) 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+
+ 1.2âPlot the function 
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\end_inset
+
+plot(x,y) xlabel("Location (x)") ylabel("Function value f(x)") title("Plot of the function f(x)") 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+The function is analytic in the region [0.1,â0.9] since its derivative exists and is continuous on this interval. The function has one singularity when defined on the real numbers â - at x=1 and two additional singularities when defined on the complex numbers â - at x=Â±0.01
+\shape italic
+i
+\shape default
+. Thus, the radius of convergence of the function is 0.1 at x=0.9 and 0.01 at x=0.
+\end_layout
+
+\begin_layout Subsection*
+
+ 1.3âVary N and spacing with boundary yââ = 0 
+\end_layout
+
+\begin_layout Standard
+
+The program provided has been modified as follows:
+\end_layout
+
+\begin_layout Standard
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+begin{verbatim}
+\end_layout
+
+\end_inset
+
+from scipy import * from scipy import special from matplotlib.pyplot import * import weave â def func(x): num=pow(x,1+special.jn(0,x)) densqr=(1+100*x*x)*(1-x) den=sqrt(densqr) return num/den â #define support code with open("spline.c","r") as f: scode=f.read()
+\end_layout
+
+\begin_layout Standard
+
+h=logspace(-4,-2,20) N=(0.8)/h print N err=zeros(h.shape) figure(0) for i in range(len(h)): x=linspace(0.1,0.9,N[i]) y=func(x) n=int(N[i]) xx=linspace(0.1,0.9,10*n+1) y2=zeros(x.size) #y2=cos(x) u=zeros(x.size) yy=zeros(xx.size) code=""" #include <math.h> int i; double xp; spline(x,y,n,0,0,y2,u); for(i=0; i<=10*n; i++)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+ xp=xx[i]; splint(x,y,y2,n,xp,yy+i); 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ """ weave.inline(code,["x","y","n","y2","u","xx","yy"],supportcode=scode,extracompileargs=["-g"],compiler="gcc") if i==0: figure(2) plot(x,y) plot(xx,yy) title("Interpolated values and data points for n=
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%d" % N[i])
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+ show() figure(0) z=abs(yy-func(xx)) plot(xx,z,label="N=
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+%d"%N[i])
+\end_layout
+
+\begin_layout Standard
+
+
+\end_layout
+
+\end_inset
+
+ err[i]=z.max() â xlabel("Location (x)") ylabel("Error profile") legend(loc="upper left") figure(1) loglog(h,err) xlabel("Spacing") ylabel("Error") title("Error vs. spacing") show() 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+
+\backslash
+end{verbatim}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+The output of the program (spline interpolation) is as follows:
+\end_layout
+
+\begin_layout Standard
+
+The error varies linearly (log-log scale) with the spacing of the points to be interpolated, as follows:
+\end_layout
+
+\begin_layout Standard
+
+The error profile for the various values of N is as below:
+\end_layout
+
+\begin_layout Standard
+
+From the above results, we can conclude that the larger the number of points (and hence, smaller the spacing between them) being evaluated, the smaller the error becomes. For obtaining an accuracy to the sixth decimal place, the error should go below 5*10âââ7 and from the graph below, we can see that we need a spacing of nearly 10âââ6, or N=800000.
+\end_layout
+
+\begin_layout Subsection*
+
+ 1.4âImplement not-a-knot and use splint 
+\end_layout
+
+\begin_layout Subsection*
+
+ 1.5âAnalytic Evaluation of the function derivative 
+\end_layout
+
+\begin_layout Standard
+
+
+\shape italic
+f
+\shape default
+(
+\shape italic
+x
+\shape default
+)â=â(
+\shape italic
+x
+\shape default
+1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+))/(â((1âââ
+\shape italic
+x
+\shape default
+)(1â+â100
+\shape italic
+x
+\shape default
+2)))
+\end_layout
+
+\begin_layout Standard
+
+
+\shape italic
+f
+\shape default
+1(
+\shape italic
+x
+\shape default
+)â=â
+\shape italic
+x
+\shape default
+1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+)
+\end_layout
+
+\begin_layout Standard
+
+
+\shape italic
+f
+\shape default
+2(
+\shape italic
+x
+\shape default
+)â=ââ((1âââ
+\shape italic
+x
+\shape default
+)(1â+â100
+\shape italic
+x
+\shape default
+2))
+\end_layout
+
+\begin_layout Standard
+
+The two functions 
+\shape italic
+f
+\shape default
+1(
+\shape italic
+x
+\shape default
+) and 
+\shape italic
+f
+\shape default
+2(
+\shape italic
+x
+\shape default
+) can be differentiated separately and then the derivative of 
+\shape italic
+f
+\shape default
+(
+\shape italic
+x
+\shape default
+) can be obtained using the quotient rule.
+\end_layout
+
+\begin_layout Standard
+
+
+\shape italic
+log
+\shape default
+(
+\shape italic
+f
+\shape default
+1(
+\shape italic
+x
+\shape default
+))â=â
+\shape italic
+log
+\shape default
+(
+\shape italic
+x
+\shape default
+).(1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+))
+\end_layout
+
+\begin_layout Standard
+
+(1)/(
+\shape italic
+f
+\shape default
+1(
+\shape italic
+x
+\shape default
+)).(
+\shape italic
+df
+\shape default
+1(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+dx
+\shape default
+)â=â(1)/(
+\shape italic
+x
+\shape default
+)â+â(
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+x
+\shape default
+)â+â(
+\shape italic
+dJ
+\shape default
+0(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+dx
+\shape default
+).
+\shape italic
+log
+\shape default
+(
+\shape italic
+x
+\shape default
+)
+\end_layout
+
+\begin_layout Standard
+
+From the properties of the Bessel functions, (
+\shape italic
+dJ
+\shape default
+0(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+dx
+\shape default
+)â=ââââ
+\shape italic
+J
+\shape default
+1(
+\shape italic
+x
+\shape default
+). Thus,
+\end_layout
+
+\begin_layout Standard
+
+(
+\shape italic
+df
+\shape default
+1(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+dx
+\shape default
+)â=â(
+\shape italic
+x
+\shape default
+1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+)(1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+)))/(
+\shape italic
+x
+\shape default
+)âââ
+\shape italic
+J
+\shape default
+1(
+\shape italic
+x
+\shape default
+).
+\shape italic
+log
+\shape default
+(
+\shape italic
+x
+\shape default
+).
+\shape italic
+x
+\shape default
+1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+)
+\end_layout
+
+\begin_layout Standard
+
+Similarly for 
+\shape italic
+f
+\shape default
+2(
+\shape italic
+x
+\shape default
+):
+\end_layout
+
+\begin_layout Standard
+
+(
+\shape italic
+df
+\shape default
+2(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+dx
+\shape default
+)â=â((200
+\shape italic
+x
+\shape default
+âââ300
+\shape italic
+x
+\shape default
+2âââ1))/(2â((1âââ
+\shape italic
+x
+\shape default
+)(1â+â100
+\shape italic
+x
+\shape default
+2)))
+\end_layout
+
+\begin_layout Standard
+
+Since 
+\shape italic
+f
+\shape default
+(
+\shape italic
+x
+\shape default
+)â=â(
+\shape italic
+f
+\shape default
+1(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+f
+\shape default
+2(
+\shape italic
+x
+\shape default
+)), using quotient rule:
+\end_layout
+
+\begin_layout Standard
+
+(
+\shape italic
+df
+\shape default
+(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+dx
+\shape default
+)â=âââ(
+\shape italic
+f
+\shape default
+2.
+\shape italic
+df
+\shape default
+1âââ
+\shape italic
+f
+\shape default
+1.
+\shape italic
+df
+\shape default
+2)/((
+\shape italic
+f
+\shape default
+2)2)ââ
+\begin_inset space ~
+
+\end_inset
+
+(
+\shape italic
+x
+\shape default
+)
+\end_layout
+
+\begin_layout Standard
+
+And so,
+\end_layout
+
+\begin_layout Standard
+
+
+\shape italic
+f
+\shape default
+â(
+\shape italic
+x
+\shape default
+)â=â(
+\shape italic
+x
+\shape default
+1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+)â¡â£(1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+))/(
+\shape italic
+x
+\shape default
+)âââ
+\shape italic
+J
+\shape default
+1(
+\shape italic
+x
+\shape default
+).
+\shape italic
+log
+\shape default
+(
+\shape italic
+x
+\shape default
+)â¤â¦)/(â((1âââ
+\shape italic
+x
+\shape default
+)(1â+â100
+\shape italic
+x
+\shape default
+2)))âââ(
+\shape italic
+x
+\shape default
+1â+â
+\shape italic
+J
+\shape default
+0(
+\shape italic
+x
+\shape default
+)(200
+\shape italic
+x
+\shape default
+âââ300
+\shape italic
+x
+\shape default
+2âââ1))/(2((1âââ
+\shape italic
+x
+\shape default
+)(1â+â100
+\shape italic
+x
+\shape default
+2)1.5)
+\end_layout
+
+\end_body
+\end_document

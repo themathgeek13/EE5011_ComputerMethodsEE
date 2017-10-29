@@ -1,0 +1,379 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+EE5011: Computer Methods in Electrical Engineering
+\end_layout
+
+\begin_layout Title
+Romberg Integration (Week 4)
+\end_layout
+
+\begin_layout Author
+Rohan Rao, EE14B118
+\end_layout
+
+\begin_layout Section
+Programming Assignment
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+I=\frac{2}{a^{2}}\intop_{0}^{a}J_{v}^{2}(\mathrm{\kappa r)rdr+\frac{2}{a^{2}}\left|\frac{J_{v}(\kappa a)}{K_{v}(\text{γa)}}\right|^{2}\int_{a}^{\text{∞}}K_{v}^{2}(\gamma r)rdr}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Transformation using the dimensionless variable 
+\begin_inset Formula $u=\frac{r}{a}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $u=\frac{r}{a}$
+\end_inset
+
+ means 
+\begin_inset Formula $r=a.u$
+\end_inset
+
+ and 
+\begin_inset Formula $dr=a.du$
+\end_inset
+
+, r=0 means u=0 and r=a means u=1
+\end_layout
+
+\begin_layout Standard
+On substituting,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+I=2\intop_{0}^{1}J_{v}^{2}(\mathrm{ku)udu+\frac{2}{a^{2}}\left|\frac{J_{v}(k)}{K_{v}(\text{g)}}\right|^{2}\int_{1}^{\text{∞}}K_{v}^{2}(gu)udu}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where k=
+\begin_inset Formula $\kappa a=2.7$
+\end_inset
+
+ and 
+\begin_inset Formula $g=\gamma a=1.2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Plot the integrand in Python
+\end_layout
+
+\begin_layout Standard
+The integrand is composed of two parts:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(u)=2*J_{v}^{2}(ku)*u
+\]
+
+\end_inset
+
+ for 
+\begin_inset Formula $0\leq u<1$
+\end_inset
+
+ and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(u)=2*\left|\frac{J_{v}^{2}(k)}{K_{v}^{2}(g)}\right|*K_{v}^{2}(gu)*u
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+for 
+\begin_inset Formula $1\leq u<\text{∞}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The plot of the function on a semi log scale (in u) is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fnplot.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+On a semi log scale in y = f(u) on the range [0.001,10] is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fnplot_2.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above plot shows that beyond x=2 (approx), the function behaves like
+ an exponentially decaying function, and by the time x=10, the value has
+ dropped by 10 orders of magnitude.
+\end_layout
+
+\begin_layout Standard
+Code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def func(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*u*sp.jv(3,2.7*u)**2   
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def func2(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*sp.kv(3,1.2*u)**2*u*abs(sp.jv(3,2.7)/sp.kv(3,1.2))**2
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def integrand(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    if u<1.0:                                                     
+\end_layout
+
+\begin_layout Plain Layout
+
+        return func(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+    else: 
+\end_layout
+
+\begin_layout Plain Layout
+
+		return func2(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+x=logspace(-3,7,200)
+\end_layout
+
+\begin_layout Plain Layout
+
+semilogx(x,integrand(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+title("Dielectric Fibre Electromagnetic Mode integrand function")
+\end_layout
+
+\begin_layout Plain Layout
+
+xlabel("Value of x ->")
+\end_layout
+
+\begin_layout Plain Layout
+
+ylabel("Value of function f(x) ->")
+\end_layout
+
+\begin_layout Plain Layout
+
+show()
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The function reaches a maximum value of nearly 0.13 at the point x=1.
+ This is not visible even in the plot above, since the logspace() function
+ defined above does not include the sample x=1.
+ This shows that even finer sampling will be required in that region.
+ The function is continuous, as can be verified from checking the value
+ from the above func() and func2() at x=1.
+ The function is not smooth at x=1 since it has a very sharp variation in
+ the second derivative, forming a discontinuity.
+ This will require a very small value of h when using trapzd integration.
+\end_layout
+
+\begin_layout Subsection
+Analytically evaluating the integral
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{\text{∞}}f(u)du
+\]
+
+\end_inset
+
+ The function func2() is the value of the integrand beyond u=1.
+ Writing it in the convenient form 
+\begin_inset Formula $f(u)=C*K_{v}(1.2u)*u$
+\end_inset
+
+, where 
+\begin_inset Formula $C=2*\left|\frac{J_{v}^{2}(k)}{K_{v}^{2}(k)}\right|,v=3,k=2.7,g=1.2$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $x\ggg v$
+\end_inset
+
+, 
+\begin_inset Formula $K_{v}(x)$
+\end_inset
+
+ can be approximated asymptotically by the function 
+\begin_inset Formula $\frac{\pi}{\sqrt{2\pi x}}e^{-x}$
+\end_inset
+
+.
+ Thus:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{\text{∞}}f(u)du=\int_{a}^{\text{∞}}\left(C*u*\frac{\pi}{\sqrt{2\pi*1.2u}}\exp(-1.2u)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

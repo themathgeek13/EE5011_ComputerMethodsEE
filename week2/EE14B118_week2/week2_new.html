@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2017-08-27"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>Spline Interpolation (Week 2)</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+EE5011: Computer Methods in Electrical Engineering
+</h1>
+<h1 class="title">
+Spline Interpolation (Week 2)
+</h1>
+<h2 class="author">
+Rohan Rao, EE14B118
+</h2>
+<h1 class="Section">
+<a class="toc" name="toc-Section-1">1</a> Programming Assignment
+</h1>
+<div class="Unindented">
+<div class="formula">
+<i>f</i>(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>x</i><sup>1 + <i>J</i><sub>0</sub>(<i>x</i>)</sup></span><span class="ignored">)/(</span><span class="denominator"><span class="sqrt"><span class="radical">√</span><span class="ignored">(</span><span class="root">(1 − <i>x</i>)(1 + 100<i>x</i><sup>2</sup>)</span><span class="ignored">)</span></span></span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.1">1.1</a> Create a table of values
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">def f(x):
+	num=pow(x,1+special.jn(0,x))
+	densqr=(1+100*x*x)*(1-x)
+	den=sqrt(densqr)
+	return num/den
+​
+x=arange(0.1,0.95,0.05) #generates a set of points with spacing of 0.05 in the range of 0.1 and 0.9
+y=f(x)
+</pre>
+</div>
+
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.2">1.2</a> Plot the function
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">plot(x,y)
+xlabel("Location (x)")
+ylabel("Function value f(x)")
+title("Plot of the function f(x)")
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+<img class="embedded" src="fnplot.png" alt="figure fnplot.png" style="max-width: 800px; max-height: 600px;"/>
+
+</div>
+<div class="Indented">
+The function is analytic in the region [0.1,0.9] since its derivative exists and is continuous on this interval. The function has one singularity when defined on the real numbers <span class="formula">ℝ</span>: at x=1 and two additional singularities when defined on the complex numbers <span class="formula">ℂ</span>: at x=<span class="formula">±0.1<i>i</i></span>. Thus, the radius of convergence of the function is 0.1 at both x=0.1 and x=0.9.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.3">1.3</a> Vary N and spacing with boundary condition of y’’=0
+</h2>
+<div class="Unindented">
+The program has been modified as follows:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">from scipy import *
+from scipy import special
+from matplotlib.pyplot import *
+import weave
+​
+def func(x):
+	num=pow(x,1+special.jn(0,x))
+	densqr=(1+100*x*x)*(1-x)
+	den=sqrt(densqr)
+	return num/den
+​
+#define support code
+with open("spline.c","r") as f:
+	scode=f.read()
+	
+h=logspace(-4,-2,20)
+N=(0.8)/h
+print N
+err=zeros(h.shape)
+figure(0)
+for i in range(len(h)):
+	x=linspace(0.1,0.9,N[i])
+	y=func(x)
+	n=int(N[i])
+	xx=linspace(0.1,0.9,10*n+1)
+	y2=zeros(x.size)
+	#y2=cos(x)
+	u=zeros(x.size)
+	yy=zeros(xx.size)
+	code="""
+	#include &lt;math.h&gt;
+	int i;
+	double xp;
+	spline(x,y,n,1e40,1e40,y2,u);
+	for(i=0; i&lt;=10*n; i++){
+		xp=xx[i];
+		splint(x,y,y2,n,xp,yy+i);
+	}
+	"""
+	weave.inline(code,["x","y","n","y2","u","xx","yy"],support_code=scode,extra_compile_args=["-g"],compiler="gcc")
+	if i==0:
+		figure(2)
+		plot(x,y)
+		plot(xx,yy)
+		title("Interpolated values and data points for n=%d" % N[i])
+		show()
+	figure(0)
+	z=abs(yy-func(xx))
+	plot(xx,z,label="N=%d"%N[i])
+	err[i]=z.max()
+​
+xlabel("Location (x)")
+ylabel("Error profile")
+legend(loc="upper left")
+figure(1)
+loglog(h,err)
+xlabel("Spacing")
+ylabel("Error")
+title("Error vs. spacing")
+show()
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The output of the program is as follows:
+</div>
+<div class="Indented">
+<img class="embedded" src="splint.png" alt="figure splint.png" style="max-width: 812px; max-height: 612px;"/>
+
+</div>
+<div class="Indented">
+The error varies linearly (log-log scale) with the spacing of points:
+</div>
+<div class="Indented">
+<img class="embedded" src="q3_errsp.png" alt="figure q3_errsp.png" style="max-width: 812px; max-height: 612px;"/>
+
+</div>
+<div class="Indented">
+The error profile for various values of N is as follows:
+</div>
+<div class="Indented">
+<img class="embedded" src="Errorprofile.png" alt="figure Errorprofile.png" style="max-width: 2318px; max-height: 1277px;"/>
+
+</div>
+<div class="Indented">
+From the above results we can conclude that the larger the number of points (and hence smaller the spacing between them) being evaluated, the smaller the error becomes. For obtaining an accuracy to the sixth decimal place, the error should be below <span class="formula">5<i>x</i>10<sup> − 7</sup></span> and from the graph above, we can see that we need a spacing of nearly <span class="formula">10<sup> − 4</sup></span>, or N=8000.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.4">1.4</a> Implement not-a-knot and then use splint
+</h2>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.5">1.5</a> Analytic Evaluation of the function derivative
+</h2>
+<div class="Unindented">
+<div class="formula">
+<i>f</i>(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>x</i><sup>1 + <i>J</i><sub>0</sub>(<i>x</i>)</sup></span><span class="ignored">)/(</span><span class="denominator"><span class="sqrt"><span class="radical">√</span><span class="ignored">(</span><span class="root">(1 − <i>x</i>)(1 + 100<i>x</i><sup>2</sup>)</span><span class="ignored">)</span></span></span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+<div class="formula">
+<i>f</i><sub>1</sub>(<i>x</i>) = <i>x</i><sup>1 + <i>J</i><sub>0</sub>(<i>x</i>)</sup>
+</div>
+
+</div>
+<div class="Indented">
+<div class="formula">
+<i>f</i><sub>2</sub>(<i>x</i>) = <span class="sqrt"><span class="radical">√</span><span class="ignored">(</span><span class="root">(1 − <i>x</i>)(1 + 100<i>x</i><sup>2</sup>)</span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+The two functions <span class="formula"><i>f</i><sub>1</sub>(<i>x</i>)</span> and <span class="formula"><i>f</i><sub>2</sub>(<i>x</i>)</span> can be differentiated separately and then the derivative of f(x) can be obtained using the quotient rule.
+</div>
+<div class="Indented">
+<div class="formula">
+<i>log</i>(<i>f</i><sub>1</sub>(<i>x</i>)) = <i>log</i>(<i>x</i>).(1 + <i>J</i><sub>0</sub>(<i>x</i>))
+</div>
+
+</div>
+<div class="Indented">
+<div class="formula">
+<span class="fraction"><span class="ignored">(</span><span class="numerator">1</span><span class="ignored">)/(</span><span class="denominator"><i>f</i><sub>1</sub>(<i>x</i>)</span><span class="ignored">)</span></span>.<span class="fraction"><span class="ignored">(</span><span class="numerator"><i>df</i><sub>1</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>dx</i></span><span class="ignored">)</span></span> = <span class="fraction"><span class="ignored">(</span><span class="numerator">1</span><span class="ignored">)/(</span><span class="denominator"><i>x</i></span><span class="ignored">)</span></span> + <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>J</i><sub>0</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>x</i></span><span class="ignored">)</span></span> + <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>dJ</i><sub>0</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>dx</i></span><span class="ignored">)</span></span>.<i>log</i>(<i>x</i>)
+</div>
+
+</div>
+<div class="Indented">
+From the properties of Bessel functions, <span class="formula"><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>dJ</i><sub>0</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>dx</i></span><span class="ignored">)</span></span> =  − <i>J</i><sub>1</sub>(<i>x</i>)</span>. Thus,
+</div>
+<div class="Indented">
+<div class="formula">
+<span class="fraction"><span class="ignored">(</span><span class="numerator"><i>df</i><sub>1</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>dx</i></span><span class="ignored">)</span></span> = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>x</i><sup>1 + <i>J</i><sub>0</sub>(<i>x</i>)</sup>(1 + <i>J</i><sub>0</sub>(<i>x</i>))</span><span class="ignored">)/(</span><span class="denominator"><i>x</i></span><span class="ignored">)</span></span> − <i>J</i><sub>1</sub>(<i>x</i>).<i>log</i>(<i>x</i>).<i>x</i><sup>1 + <i>J</i><sub>0</sub>(<i>x</i>)</sup>
+</div>
+
+</div>
+<div class="Indented">
+Similarly for <span class="formula"><i>f</i><sub>2</sub>(<i>x</i>)</span>:
+</div>
+<div class="Indented">
+<div class="formula">
+<span class="fraction"><span class="ignored">(</span><span class="numerator"><i>df</i><sub>2</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>dx</i></span><span class="ignored">)</span></span> = <span class="fraction"><span class="ignored">(</span><span class="numerator">(200<i>x</i> − 300<i>x</i><sup>2</sup> − 1)</span><span class="ignored">)/(</span><span class="denominator">2<span class="sqrt"><span class="radical">√</span><span class="ignored">(</span><span class="root">(1 − <i>x</i>)(1 + 100<i>x</i><sup>2</sup>)</span><span class="ignored">)</span></span></span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+Since <span class="formula"><i>f</i>(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>f</i><sub>1</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>f</i><sub>2</sub>(<i>x</i>)</span><span class="ignored">)</span></span></span>, using quotient rule,
+</div>
+<div class="Indented">
+<div class="formula">
+<span class="fraction"><span class="ignored">(</span><span class="numerator"><i>df</i>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>dx</i></span><span class="ignored">)</span></span> = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>f</i><sub>2</sub>.<i>df</i><sub>1</sub> − <i>f</i><sub>1</sub>.<i>df</i><sub>2</sub></span><span class="ignored">)/(</span><span class="denominator">(<i>f</i><sub>2</sub>)<sup>2</sup></span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+And so,
+</div>
+<div class="Indented">
+<div class="formula">
+<i>f</i>’(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>x</i><sup>1 + <i>J</i><sub>0</sub>(<i>x</i>)</sup><span class="array"><span class="arrayrow"><span class="bracket align-left">⎡</span></span><span class="arrayrow"><span class="bracket align-left">⎣</span></span></span><span class="fraction"><span class="ignored">(</span><span class="numerator">1 + <i>J</i><sub>0</sub>(<i>x</i>)</span><span class="ignored">)/(</span><span class="denominator"><i>x</i></span><span class="ignored">)</span></span> − <i>J</i><sub>1</sub>(<i>x</i>).<i>log</i>(<i>x</i>)<span class="array"><span class="arrayrow"><span class="bracket align-right">⎤</span></span><span class="arrayrow"><span class="bracket align-right">⎦</span></span></span></span><span class="ignored">)/(</span><span class="denominator"><span class="sqrt"><span class="radical">√</span><span class="ignored">(</span><span class="root">(1 − <i>x</i>)(1 + 100<i>x</i><sup>2</sup>)</span><span class="ignored">)</span></span></span><span class="ignored">)</span></span> − <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>x</i><sup>1 + <i>J</i><sub>0</sub>(<i>x</i>)</sup>(200<i>x</i> − 300<i>x</i><sup>2</sup> − 1)</span><span class="ignored">)/(</span><span class="denominator">2<span class="symbol">(</span>(1 − <i>x</i>)(1 + 100<i>x</i><sup>2</sup><span class="symbol">)</span><sup>1.5</sup></span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+Evaluating this function derivative at the points x=0.1 and x=0.9:
+</div>
+<div class="Indented">
+<span class="formula"><i>f</i>’(<i>x</i>)|<sub><i>x</i> = 0.1</sub> = 0.117288</span>
+</div>
+<div class="Indented">
+<span class="formula"><i>f</i>’(<i>x</i>)|<sub><i>x</i> = 0.9</sub> = 1.71855</span>
+</div>
+<div class="Indented">
+Using this for the spline function call gives the following set of maximum error values for different spacings:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">[  4.04399847e-11   5.15273380e-11   6.56547594e-11   8.36139491e-11
+   1.06426368e-10   1.35298328e-10   1.71607228e-10   2.16412332e-10
+   2.69893607e-10   3.27979033e-10   3.79605181e-10   3.99744626e-10
+   7.31053273e-10   1.62706848e-09   3.82562831e-09   9.84342896e-09
+   2.76302701e-08   7.59388466e-08   2.03118858e-07   5.12266858e-07]
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This is around 3 orders of magnitude smaller than the one that assumes a natural spline fit (y’’=0 at the boundaries):
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">[  1.18177794e-08   1.91912783e-08   3.11743003e-08   5.06187381e-08
+   8.21990198e-08   1.33493015e-07   2.16932356e-07   3.52319880e-07
+   5.72755966e-07   9.29372786e-07   1.51269180e-06   2.45458206e-06
+   3.99519920e-06   6.50020535e-06   1.05992276e-05   1.72890126e-05
+   2.80538319e-05   4.59852693e-05   7.51624356e-05   1.19998543e-04]
+</pre>
+</div>
+
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.6">1.6</a> 100x the actual derivative for boundaries
+</h2>
+<div class="Unindented">
+Using 100x the function derivative at the points x=0.1 and x=0.9:
+</div>
+<div class="Indented">
+<span class="formula"><i>f</i>’(<i>x</i>)|<sub><i>x</i> = 0.1</sub> = 11.7288</span>
+</div>
+<div class="Indented">
+<span class="formula"><i>f</i>’(<i>x</i>)|<sub><i>x</i> = 0.9</sub> = 171.855</span>
+</div>
+<div class="Indented">
+Output (max errors):
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">[ 0.002888    0.00368029  0.00469061  0.00597706  0.00761671  0.00970658
+  0.01237379  0.01576938  0.0201066   0.02561299  0.03267817  0.04162913
+  0.05311506  0.06776002  0.08654521  0.11057097  0.14092375  0.18057983
+  0.23117527  0.29267474]
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Clearly, the errors have increased by nearly an order of 8. This shows that the magnitude of the derivative at the boundaries plays an important role in obtaining the spline fit coefficients. The points near the edge have the maximum error, as can be seen from the plot below.
+</div>
+<div class="Indented">
+<img class="embedded" src="100xder.png" alt="figure 100xder.png" style="max-width: 2318px; max-height: 1277px;"/>
+
+</div>
+<div class="Indented">
+The function is of the form of a FIR filter with zeros at the points where the value is known, since the spline fit needs to pass through those points.
+</div>
+
+<hr class="footer"/>
+<div class="footer" id="generated-by">
+Document generated by <a href="http://elyxer.nongnu.org/">eLyXer 1.2.5 (2013-03-10)</a> on <span class="create-date">2017-08-27T18:15:12.993115</span>
+</div>
+</div>
+</body>
+</html>

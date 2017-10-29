@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2017-10-15"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>EE5011: Fitting of Functions</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+EE5011: Fitting of Functions
+</h1>
+<h2 class="author">
+Rohan Rao, EE14B118
+</h2>
+<h1 class="Section">
+<a class="toc" name="toc-Section-1">1</a> Programming Assignment
+</h1>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.1">1.1</a> The function is f(x) = <span class="formula"><i>x</i>*<i>J</i><sub>1</sub>(<i>x</i>)</span>.
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">import scipy.special.jn as jn
+​
+def f(x):
+	return jn(1,x)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The Chebyshev form of an interpolating polynomial (for x in range [-1,1]) is as follows:
+</div>
+<div class="Indented">
+<div class="formula">
+<i>p</i>(<i>x</i>) = <i>b</i><sub>0</sub><i>T</i><sub>0</sub>(<i>x</i>) + <i>b</i><sub>1</sub><i>T</i><sub>1</sub>(<i>x</i>) + ... + <i>b</i><sub><i>N</i></sub><i>T</i><sub><i>N</i></sub>(<i>x</i>)
+</div>
+
+</div>
+<div class="Indented">
+Since we are given data for N points <span class="formula">(<i>x</i><sub><i>i</i></sub>, <i>y</i><sub><i>i</i></sub>)</span> for i=0,1,2,...N, we need to determine the coefficients <span class="formula"><i>b</i><sub><i>k</i></sub></span> such that <span class="formula"><i>p</i>(<i>x</i><sub><i>i</i></sub>) = <i>y</i><sub><i>i</i></sub></span>. This can be written in the form of a linear system Tb=y. If the data is not contained in the interval [-1,1], it needs to be transformed accordingly. The final function for fitting the polynomial is below. This can also be obtained by using the inbuilt np.polynomial.chebyshev.chebfit function in Numpy.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def chebfit(xdata,ydata,x):
+     ...:     n=len(xdata)
+     ...:     xmax=max(xdata)
+     ...:     xmin=min(xdata)
+     ...:     xdata=(2*xdata-xmax-xmin)/(xmax-xmin)
+     ...:     T=np.zeros((n,n))
+     ...:     T[:,0]=1
+     ...:     T[:,1]=xdata
+     ...:     for j in range(2,n):
+     ...:         T[:,j]=2*xdata*T[:,j-1]-T[:,j-2]
+     ...:     b=np.dot(np.linalg.inv(T),ydata)
+     ...:     x=(2*x-xmax-xmin)/(xmax-xmin)
+     ...:     y=np.zeros(len(x))
+     ...:     for j in range(n):
+     ...:         y=y+b[j]*cos((j-1)*arccos(x));
+     ...:     return y,b
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The coefficients (semilog) plot obtained by running this on 50 points in range (0,5) is as follows:
+</div>
+<div class="Indented">
+<img class="embedded" src="chebfitcoeffmag.png" alt="figure chebfitcoeffmag.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+Thus, the use of 15 coefficients is sufficient for obtaining an accuracy of the order of 15 significant figures. 
+</div>
+<div class="Indented">
+The Chebyshev fit can be generated using the following commands:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def chebpoly(n,x):
+     ...:     if(n==0):         
+     ...:         return 1      
+     ...:     if(n==1):         
+     ...:         return x
+     ...:     return 2*x*chebpoly(n-1,x)-chebpoly(n-2,x)
+​
+def chebapproxfn(coeff,x):
+     ...:     n=len(coeff)      
+     ...:     s=0               
+     ...:     for i in range(n):
+     ...:         s+=coeff[i]*chebpoly(i,x)
+     ...:     return s 
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The error obtained over the interval 0 &lt; x &lt; 5 is as follows:
+</div>
+<div class="Indented">
+<img class="embedded" src="err_cheb.png" alt="figure err_cheb.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+Discontinuities in the above semilog graph are due to an error of exactly 0.
+</div>
+<div class="Indented">
+The error can be seen to be of the order of <span class="formula">10<sup> − 14</sup></span> to <span class="formula">10<sup> − 15</sup></span>, approximately.
+</div>
+<div class="Indented">
+Similarly, the chebder function from numpy.polynomial.chebyshev can be used as follows:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">dercoeff=np.polynomial.chebyshev.chebder(coeff)
+errd=chebapproxfn(dercoeff,xdata)-xdata*jn(0,xdata)
+semilogy(xdata,errd)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The plot is as below:
+</div>
+<div class="Indented">
+<img class="embedded" src="err_cheb_der.png" alt="figure err_cheb_der.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The discontinuities are due to an error of exactly zero. Once again, the error is at worst, of the order of <span class="formula">10<sup> − 13</sup></span>.
+</div>
+<div class="Indented">
+The difference of samples method, for a value of delta=0.01, gives the following plot:
+</div>
+<div class="Indented">
+<img class="embedded" src="diffder_err.png" alt="figure diffder_err.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+Changing delta to 1e-5 gives the following plot:
+</div>
+<div class="Indented">
+<img class="embedded" src="diffder_errdel5.png" alt="figure diffder_errdel5.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+This has an error of the order of <span class="formula">10<sup> − 10</sup></span>. In general, using the difference of samples method when calculating the derivative does not allow us to use such a small value of delta, and so the error would be considerably more than obtained in the second graph. Graph 1 is somewhat more reasonable, but the following shows the error for delta=0.1, which is for 50 points being sampled.
+</div>
+<div class="Indented">
+<img class="embedded" src="diffder_errdel1.png" alt="figure diffder_errdel1.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+This error is of the order of 3 decimal places, and so is not very accurate, relative to the Chebyshev derivative, which is significantly more accurate.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.2">1.2</a> The function is f(x) = sin(x).
+</h2>
+<div class="Unindented">
+Using the functions defined above, the following error plot is obtained with 10 coefficients and 200 samples.
+</div>
+<div class="Indented">
+<img class="embedded" src="200termsin.png" alt="figure 200termsin.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The error is not uniform, it is of the form of an FIR filter with regularly spaced taps.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.3">1.3</a> Five functions
+</h2>
+<h3 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-1.3.1">1.3.1</a> Fitting the function f(x) using 200 points in the range [-1,1] and 15 coefficients for the Chebyshev series gives the following plot:
+</h3>
+<div class="Unindented">
+<img class="embedded" src="fx_err.png" alt="figure fx_err.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The maximum error over the interval is of the order of <span class="formula">10<sup> − 15</sup>.</span>
+</div>
+<h3 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-1.3.2">1.3.2</a> Fitting the function u(x) using 200 points in the range [-1,1] and 30 coefficients for the Chebyshev series:
+</h3>
+<div class="Unindented">
+The function <span class="formula"><i>u</i>(<i>x</i>) = <i>e</i><sup> − |<i>x</i>|</sup></span> is not easily approximated over the full interval by a single polynomial set. The use of 30 coefficients still gives an error of <span class="formula"> ~ 10<sup> − 3</sup></span>.
+</div>
+<div class="Indented">
+<img class="embedded" src="ux_30.png" alt="figure ux_30.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+When considering the split intervals of [-1,0) and (0,1] we get a significantly better result with just 15 coefficients for [-1,0):
+</div>
+<div class="Indented">
+<img class="embedded" src="ux_15_neg.png" alt="figure ux_15_neg.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The discontinuties are due to an error of exactly zero on a semilog plot.
+</div>
+<div class="Indented">
+Similarly, for positive values of x, the 15 coefficient plot is below:
+</div>
+<div class="Indented">
+<img class="embedded" src="ux_15_pos.png" alt="figure ux_15_pos.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+This shows that splitting the function u(x) into two intervals and fitting each separately correctly removes the kink in the function at x=0 and allows it to be fitted properly.
+</div>
+<h3 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-1.3.3">1.3.3</a> Fitting the function v(x) using 200 points in the range [-1,1] and 30 coefficients for the Chebyshev series:
+</h3>
+<div class="Unindented">
+The function v(x) has a branch cut discontinuity at x=-1.1, which is outside the range [-1,1] but still causes the number of coefficients required to increase significantly.
+</div>
+<div class="Indented">
+<img class="embedded" src="vx_30.png" alt="figure vx_30.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The plot above shows that using 30 coefficients gives an error of the order of <span class="formula">10<sup> − 8</sup>.</span> The use of 15 coefficients gives an error of the order <span class="formula">10<sup> − 6</sup>.</span>
+</div>
+<h3 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-1.3.4">1.3.4</a> Fitting the function g(x) for different values of delta and 200 points in range [-1,1]:
+</h3>
+<div class="Unindented">
+For delta=0.1, 200 points are insufficient for obtaining an error of being 0.1 even by taking upto 50 coefficients.
+</div>
+<div class="Indented">
+For delta=1, about 15 terms are required for an error of order <span class="formula">10<sup> − 6</sup></span>:
+</div>
+<div class="Indented">
+<img class="embedded" src="gx_del1.png" alt="figure gx_del1.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=10, a significantly smaller number of terms (N=7) is required for very high accuracy:
+</div>
+<div class="Indented">
+<img class="embedded" src="gx_del10.png" alt="figure gx_del10.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=100, just 3 terms are necessary for such accuracy:
+</div>
+<div class="Indented">
+<img class="embedded" src="gx_del100.png" alt="figure gx_del100.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+This shows that the smoother the function becomes over the interval, the more easily it can be approximated by a Chebyshev fit.
+</div>
+<div class="Indented">
+<img class="embedded" src="g(x01).png" alt="figure g(x01).png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=0.1
+</div>
+<div class="Indented">
+<img class="embedded" src="g(x1).png" alt="figure g(x1).png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=1
+</div>
+<div class="Indented">
+<img class="embedded" src="g(x10).png" alt="figure g(x10).png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=10
+</div>
+<div class="Indented">
+<img class="embedded" src="g(x100).png" alt="figure g(x100).png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=100
+</div>
+<h3 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-1.3.5">1.3.5</a> Fitting the function h(x) for different values of delta and 200 points in range [-1,1]:
+</h3>
+<div class="Unindented">
+For delta=1, with 20 coefficients:
+</div>
+<div class="Indented">
+<img class="embedded" src="h(x1).png" alt="figure h(x1).png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=10, with 15 coefficients:
+</div>
+<div class="Indented">
+<img class="embedded" src="h(x10).png" alt="figure h(x10).png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For delta=100, with 10 coefficients:
+</div>
+<div class="Indented">
+<img class="embedded" src="h(x1000.png" alt="figure h(x1000.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+Plotting h(x) for different values of delta shows that small values of delta force the function to have sharp kinks at the edges of the interval, thus requiring significantly more coefficients for the Chebyshev series to converge.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.4">1.4</a> Fourier function fitting
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">from scipy.integrate import quad
+​
+def f1(x,m):
+	return f(x)*cos(m*(x+1)*np.pi/2)
+​
+def fouriercoeffs(f1,N):
+     ...:     fcoeff=[]
+     ...:     for i in range(N):
+     ...:         fcoeff.append(quad(f1,-1,1,args=(i))[0])
+     ...:     return np.array(fcoeff)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Plots of fouriercoeffs for N=100 are as follows:
+</div>
+<div class="Indented">
+<img class="embedded" src="hx_fourier.png" alt="figure hx_fourier.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+Clearly, since h(x) is periodic, it is able to be approximated well by a Fourier fit. The value of delta influences how quickly the series converges, with larger delta converging more quickly than small delta.
+</div>
+<div class="Indented">
+<img class="embedded" src="gx_fourier.png" alt="figure gx_fourier.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+g(x) does not converge quickly, having well over 100 coefficients for various values of delta.
+</div>
+<div class="Indented">
+<img class="embedded" src="vx_fourier.png" alt="figure vx_fourier.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The magnitude of the coefficients of v(x) drop exponentially, but still are of the order of <span class="formula">10<sup> − 4</sup></span> at N=100.
+</div>
+<div class="Indented">
+<img class="embedded" src="fx_fourier.png" alt="figure fx_fourier.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The coefficients of f(x) also drop in magnitude similar to v(x).
+</div>
+<div class="Indented">
+<img class="embedded" src="ux_fourier.png" alt="figure ux_fourier.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The coefficients of u(x) also don’t quickly decay with N.
+</div>
+
+</div>
+</body>
+</html>

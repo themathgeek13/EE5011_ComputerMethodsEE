@@ -1,0 +1,242 @@
+% This file was converted from HTML to LaTeX with
+% gnuhtml2latex program
+% (c) Tomasz Wegrzanowski <maniek@beer.com> 1999
+% (c) Gunnar Wolf <gwolf@gwolf.org> 2005-2010
+% Version : 0.4.
+\documentclass{article}
+\begin{document}
+
+
+\section*{
+EE5011: Computer Methods in Electrical Engineering
+}
+\section*{
+Spline Interpolation (Week 2)
+}
+\subsection*{
+Rohan Rao, EE14B118
+}
+\section*{
+1 Programming Assignment
+}
+
+
+\textit{f}(\textit{x}) = (\textit{x}1 + \textit{J}0(\textit{x}))/(√((1 − \textit{x})(1 + 100\textit{x}2)))
+
+
+
+\subsection*{
+1.1 Create a table of values
+}
+
+
+\begin{verbatim}def f(x):
+	num=pow(x,1+special.jn(0,x))
+	densqr=(1+100*x*x)*(1-x)
+	den=sqrt(densqr)
+	return num/den
+​
+x=arange(0.1,0.95,0.05) #generates a set of points with spacing of 0.05 in the range of 0.1 and 0.9
+y=f(x)
+\end{verbatim}
+
+
+
+\subsection*{
+1.2 Plot the function
+}
+
+
+\begin{verbatim}plot(x,y)
+xlabel("Location (x)")
+ylabel("Function value f(x)")
+title("Plot of the function f(x)")
+\end{verbatim}
+
+
+
+
+
+
+
+
+The function is analytic in the region [0.1, 0.9] since its derivative exists and is continuous on this interval. The function has one singularity when defined on the real numbers ℝ - at x=1 and two additional singularities when defined on the complex numbers ℂ - at x=±0.01\textit{i}. Thus, the radius of convergence of the function is 0.1 at x=0.9 and 0.01 at x=0.
+
+\subsection*{
+1.3 Vary N and spacing with boundary y’’ = 0
+}
+
+The program provided has been modified as follows:
+
+
+
+\begin{verbatim}from scipy import *
+from scipy import special
+from matplotlib.pyplot import *
+import weave
+​
+def func(x):
+	num=pow(x,1+special.jn(0,x))
+	densqr=(1+100*x*x)*(1-x)
+	den=sqrt(densqr)
+	return num/den
+​
+#define support code
+with open("spline.c","r") as f:
+	scode=f.read()
+	
+h=logspace(-4,-2,20)
+N=(0.8)/h
+print N
+err=zeros(h.shape)
+figure(0)
+for i in range(len(h)):
+	x=linspace(0.1,0.9,N[i])
+	y=func(x)
+	n=int(N[i])
+	xx=linspace(0.1,0.9,10*n+1)
+	y2=zeros(x.size)
+	#y2=cos(x)
+	u=zeros(x.size)
+	yy=zeros(xx.size)
+	code="""
+	#include <math.h>
+	int i;
+	double xp;
+	spline(x,y,n,0,0,y2,u);
+	for(i=0; i<=10*n; i++){
+		xp=xx[i];
+		splint(x,y,y2,n,xp,yy+i);
+	}
+	"""
+	weave.inline(code,["x","y","n","y2","u","xx","yy"],support_code=scode,extra_compile_args=["-g"],compiler="gcc")
+	if i==0:
+		figure(2)
+		plot(x,y)
+		plot(xx,yy)
+		title("Interpolated values and data points for n=%d" % N[i])
+		show()
+	figure(0)
+	z=abs(yy-func(xx))
+	plot(xx,z,label="N=%d"%N[i])
+	err[i]=z.max()
+​
+xlabel("Location (x)")
+ylabel("Error profile")
+legend(loc="upper left")
+figure(1)
+loglog(h,err)
+xlabel("Spacing")
+ylabel("Error")
+title("Error vs. spacing")
+show()
+\end{verbatim}
+
+
+
+
+The output of the program (spline interpolation) is as follows:
+
+
+
+
+
+
+The error varies linearly (log-log scale) with the spacing of the points to be interpolated, as follows:
+
+
+
+
+
+
+The error profile for the various values of N is as below:
+
+
+
+
+
+
+From the above results, we can conclude that the larger the number of points (and hence, smaller the spacing between them) being evaluated, the smaller the error becomes. For obtaining an accuracy to the sixth decimal place, the error should go below 5*10 − 7 and from the graph below, we can see that we need a spacing of nearly 10 − 6, or N=800000.
+
+
+
+
+
+\subsection*{
+1.4 Implement not-a-knot and use splint
+}
+\subsection*{
+1.5 Analytic Evaluation of the function derivative
+}
+
+
+\textit{f}(\textit{x}) = (\textit{x}1 + \textit{J}0(\textit{x}))/(√((1 − \textit{x})(1 + 100\textit{x}2)))
+
+
+
+
+
+\textit{f}1(\textit{x}) = \textit{x}1 + \textit{J}0(\textit{x})
+
+
+
+
+
+\textit{f}2(\textit{x}) = √((1 − \textit{x})(1 + 100\textit{x}2))
+
+
+
+
+The two functions \textit{f}1(\textit{x}) and \textit{f}2(\textit{x}) can be differentiated separately and then the derivative of \textit{f}(\textit{x}) can be obtained using the quotient rule.
+
+
+
+\textit{log}(\textit{f}1(\textit{x})) = \textit{log}(\textit{x}).(1 + \textit{J}0(\textit{x}))
+
+
+
+
+
+(1)/(\textit{f}1(\textit{x})).(\textit{df}1(\textit{x}))/(\textit{dx}) = (1)/(\textit{x}) + (\textit{J}0(\textit{x}))/(\textit{x}) + (\textit{dJ}0(\textit{x}))/(\textit{dx}).\textit{log}(\textit{x})
+
+
+
+
+From the properties of the Bessel functions, (\textit{dJ}0(\textit{x}))/(\textit{dx}) =  − \textit{J}1(\textit{x}). Thus,
+
+
+
+(\textit{df}1(\textit{x}))/(\textit{dx}) = (\textit{x}1 + \textit{J}0(\textit{x})(1 + \textit{J}0(\textit{x})))/(\textit{x}) − \textit{J}1(\textit{x}).\textit{log}(\textit{x}).\textit{x}1 + \textit{J}0(\textit{x})
+
+
+
+
+Similarly for \textit{f}2(\textit{x}):
+
+
+
+(\textit{df}2(\textit{x}))/(\textit{dx}) = ((200\textit{x} − 300\textit{x}2 − 1))/(2√((1 − \textit{x})(1 + 100\textit{x}2)))
+
+
+
+
+Since \textit{f}(\textit{x}) = (\textit{f}1(\textit{x}))/(\textit{f}2(\textit{x})), using quotient rule:
+
+
+
+(\textit{df}(\textit{x}))/(\textit{dx}) = ⎛⎝(\textit{f}2.\textit{df}1 − \textit{f}1.\textit{df}2)/((\textit{f}2)2)⎞�~(\textit{x})
+
+
+
+
+And so,
+
+
+
+\textit{f}’(\textit{x}) = (\textit{x}1 + \textit{J}0(\textit{x})⎡⎣(1 + \textit{J}0(\textit{x}))/(\textit{x}) − \textit{J}1(\textit{x}).\textit{log}(\textit{x})⎤⎦)/(√((1 − \textit{x})(1 + 100\textit{x}2))) − (\textit{x}1 + \textit{J}0(\textit{x})(200\textit{x} − 300\textit{x}2 − 1))/(2((1 − \textit{x})(1 + 100\textit{x}2)1.5)
+
+
+
+
+
+\end{document}

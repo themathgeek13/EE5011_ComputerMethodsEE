@@ -1,0 +1,9 @@
+Consider the interior nodes of a uniformly spaced spline interpolation problem. All the rows have three entries that have constant entries. So each row looks like
+
+A*y_{n-1} + B*y_n +C*y_{n+1} = f_n
+
+This is nothing but an IIR filter, and its stability depends on A, B and C. For the spline case, show that the two poles are one inside the unit circle and the other outside. The system is unconditionally unstable whatever the starting values.
+
+To prove this, start the problem with known values of y'_0 and y''_0 (for a known problem like sin(x)). Obtain y''_i and hence interpolate and obtain y(x). Show it is very unstable.
+
+So why does spline integration work so well?

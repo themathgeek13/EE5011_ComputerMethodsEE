@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2017-09-25"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>Numerical Integration of Singular Integrals (Week 5)</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+EE5011: Computer Methods in Electrical Engineering
+</h1>
+<h1 class="title">
+Numerical Integration of Singular Integrals (Week 5)
+</h1>
+<h2 class="author">
+Rohan Rao, EE14B118
+</h2>
+<h1 class="Section">
+<a class="toc" name="toc-Section-1">1</a> Programming Assignment - Singular Integrals
+</h1>
+<div class="Unindented">
+<div class="formula">
+<i>J</i> = <span class="limits"><sup class="limit">3</sup><span class="limit">⌠</span><span class="limit">⌡</span><sub class="limit">1</sub></span><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>e</i><sup> − <i>x</i></sup></span><span class="ignored">)/(</span><span class="denominator"><i>J</i><sub>1</sub><span class="symbol">(</span><span class="sqrt"><span class="radical">√</span><span class="ignored">(</span><span class="root"> − <i>x</i><sup>2</sup> + 4<i>x</i> − 3</span><span class="ignored">)</span></span><span class="symbol">)</span></span><span class="ignored">)</span></span><i>dx</i>
+</div>
+
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.1">1.1</a> Graph the integrand in Python from x=1 to x=3
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">from scipy.special import jv
+from pylab import *
+​
+def integrand(x):
+    return np.exp(-x)/jv(1,np.sqrt(-x**2+4*x-3))
+​
+#&gt;&gt;&gt;&gt;&gt;&gt;&gt;Singular Integrals
+#q1. Graphing the Integrand
+eps=1e-6
+x=linspace(1+eps,3-eps,1000)
+semilogy(x,integrand(x),’ro’)
+semilogy(x,integrand(x))
+title(r’Graph of the integrand $e^{-x}/J1(\sqrt{-x^2+4x-3})$ from $x=1$ to $x=3$’)
+xlabel("value of x")
+ylabel("value of f(x)")
+show()
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_1.png" alt="figure figure_1.png" style="max-width: 812px; max-height: 612px;"/>
+
+</div>
+<div class="Indented">
+The semilog plot above is obtained, showing the singularities at x=1 and x=3.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.2">1.2</a> Integrate using scipy.quad
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#q2. Using quad for evaluating the function
+from scipy import integrate
+print integrate.quad(integrand,1,3)
+#OUTPUT: (1.140489938554265, 5.333975483523545e-10)
+# n_evals: 567
+</pre>
+</div>
+
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.3">1.3</a> Use Open Romberg to integrate and study the convergence
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#q3. Using open Romberg for integration
+import sing_intg as si
+print si.qromo(integrand,1,3,eps=1e-5)
+#requires 81 function calls
+​
+print si.qromo(integrand,1,3,eps=1e-6)
+#requires 2187 function calls
+​
+print si.qromo(integrand,1,3,eps=1e-7)
+#requires 531441 function calls
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+It can be seen that the number of function calls increases exponentially with decreasing order of magnitude of the required tolerance.
+</div>
+<h1 class="Section">
+<a class="toc" name="toc-Section-2">2</a> Programming Assignment - Gaussian Quadratures
+</h1>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-2.1">2.1</a> Transform integral to (-1,1)
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#q1. transform to -1 to 1.
+# Let t = x-2
+def f(t):
+    return np.exp(-t-2)*np.sqrt(1-t*t)/jv(1,sqrt(1-t**2))
+​
+#https://en.wikipedia.org/wiki/Chebyshev%E2%80%93Gauss_quadrature
+#integral from -1 to 1 f(x)dx/sqrt(1-x^2)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Setting t=x-2 converts the limits to -1,1.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-2.2">2.2</a> Evaluate using Gauss-Chebyshev quadratures
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#q2. Gauss-Chebyshev Quadrature
+def calcGQ(x,w):
+    sum=0.0
+    for i in range(len(x)):
+        sum+=f(x[i])*w[i]
+    return sum
+​
+x=np.array(range(20))
+x=cos(np.pi*(x-0.5)/20)
+print x
+w=np.full(20,np.pi/20)
+exactVal=calcGQ(x,w)
+print exactVal
+​
+intvals=[]; errors=[]
+​
+for i in range(1,20):
+    x=np.array(range(i))
+    x=cos(np.pi*(x-0.5)/i)
+    w=np.full(i,np.pi/i)
+    intVal=calcGQ(x,w)
+    print intVal, intVal-exactVal
+    intvals.append(intVal)
+    errors.append(abs(intVal-exactVal))
+​
+plot(range(1,20),errors,’ro’)
+plot(range(1,20),errors)
+title("Error v/s N for the Gauss-Chebyshev Quadratures")
+xlabel("Number of points (N)")
+ylabel("Error considering N=20 is exact")
+show()
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_2.png" alt="figure figure_2.png" style="max-width: 812px; max-height: 612px;"/>
+
+</div>
+<h1 class="Section">
+<a class="toc" name="toc-Section-3">3</a> Romberg assignment functions
+</h1>
+<div class="Unindented">
+<div class="formula">
+<i>I</i><sub>1</sub> = <span class="limits"><sup class="limit">1</sup><span class="limit">⌠</span><span class="limit">⌡</span><sub class="limit">0</sub></span><i>J</i><span class="scripts"><sup class="script">2</sup><sub class="script"><i>v</i></sub></span>(<i>ku</i>)<i>udu</i>
+</div>
+
+</div>
+<div class="Indented">
+<div class="formula">
+<i>I</i><sub>2</sub> = <span class="limits"><sup class="limit"><span class="text"> ∞</span></sup><span class="limit">⌠</span><span class="limit">⌡</span><sub class="limit">0</sub></span><i>K</i><span class="scripts"><sup class="script">2</sup><sub class="script"><i>v</i></sub></span>(<i>gu</i>)<i>udu</i>
+</div>
+
+</div>
+<div class="Indented">
+where k=2.7 and g=1.2, and <span class="formula"><i>ν</i></span>=3.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-3.1">3.1</a> Define functions for both integrands
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#q3_1
+import scipy.special as sp
+def f1(u):
+    return u*sp.jv(3,2.7*u)**2
+​
+def f2(u):
+    return u*sp.kv(3,1.2*u)**2
+</pre>
+</div>
+
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-3.2">3.2</a> Use quad to evaluate to accuracy of <span class="formula">10<sup> − 12</sup></span>
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#q3_2
+int1=integrate.quad(f1,0,1,epsabs=1e-12,epsrel=1e-12)
+print int1
+# num_evals=21, error is order 1e-16
+​
+int2=integrate.quad(f2,1,np.inf,epsabs=1e-12,epsrel=1e-12)
+print int2
+# num_evals=75, error is order 1e-8 initially
+# num_evals=105, error is order 8e-13
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The number of evaluations required for scipy.quad is 21 and 105 respectively.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-3.3">3.3</a> Use Gauss-Legendre &amp; Gauss-Laguerre
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#q3_3
+import gauss_quad as gq
+x,w=gq.gauleg(0,1,10)
+total=0.0
+for i in range(len(x)):
+    total+=f1(x[i])*w[i]
+print total, total-int1[0]
+​
+#Gauss-Laguerre for I2
+def newf2(u):
+    return f2(u+1)*np.exp(u)
+​
+x,w=gq.gaulag(120,0.0)
+total=0.0
+for i in range(len(x)):
+    total+=newf2(x[i])*w[i]
+print total, total-int2[0]
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Gauss-Legendre on <span class="formula"><i>I</i><sub>1</sub></span> gives an error of the order of <span class="formula">10<sup> − 16</sup></span> and requires 10 function evaluations (N=10 for the quadrature). Similarly, Gauss-Laguerre on <span class="formula"><i>I</i><sub>2</sub></span> gives an error of the order of <span class="formula">10<sup> − 12</sup></span> and requires 120 function evaluations (N=120 for the quadrature). However, I have used a naive implementation which takes f(u) as <span class="formula"><i>f</i><sub>1</sub>(<i>u</i>).<i>e</i><sup><i>u</i></sup></span> for the whole interval, whereas if the asymptotic behaviour for large x is considered, it may be possible to improve.<a class="URL" href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Laguerre_quadrature"> Wikipedia says that this approach may not always be numerically stable.</a>
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-3.4">3.4</a> Use Romberg for the first integral
+</h2>
+<div class="Unindented">
+<div class="listing">
+<pre class="listing">#Using Romberg
+import romberg as r
+rombval=r.qromb(f1,0,1,eps=1e-12)
+print rombval, rombval[0]-int1[0]
+#Setting 1e-12 accuracy requires 129 function calls and gives 1e-18 error
+#(0.009969186534269642, -1.0555978304531426e-16, 129)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Using closed Romberg on the first function, since the function does not have any singularities and the interval is finite, the number of function calls is 129, and the error is of the order of <span class="formula">10<sup> − 18</sup></span> relative to the scipy.quad answer (assumed to be exact).
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-3.5">3.5</a> Transform the infinite range to a finite range
+</h2>
+<div class="Unindented">
+The infinite range of the second integration can be transformed using u=tan(w).
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">#Transform using u=tan(w)
+def newf3(w):
+    return np.tan(w)*sp.kv(3,1.2*np.tan(w))**2/(np.cos(w)**2)
+​
+rombval2=r.qromb(newf3,np.pi/4,np.pi/2,eps=1e-12)
+print rombval2,rombval2[0]-int2[0]
+#Setting 1e-12 accuracy requires 257 function calls and gives 1e-14 error
+#(3.0924507786178475, -1.5258472381249202e-14, 257)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This gives an error of <span class="formula">10<sup> − 14</sup></span> relative to scipy.quad and requires 257 function calls. It is possible to use closed Romberg because the new function is integrated over a finite range of the variable w, <span class="formula"><span class="array"><span class="arrayrow"><span class="bracket align-left">⎡</span></span><span class="arrayrow"><span class="bracket align-left">⎣</span></span></span><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">4</span><span class="ignored">)</span></span>, <span class="fraction"><span class="ignored">(</span><span class="numerator"><i>π</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎤</span></span><span class="arrayrow"><span class="bracket align-right">⎦</span></span></span></span>.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-3.6">3.6</a> Comparison of various methods
+</h2>
+<div class="Unindented">
+For the first integral, the Gauss-Legendre method has beat scipy.quad by nearly 2x, since it requires around half the function evaluations. For the second integral, the Gauss-Laguerre method does nearly as well as scipy.quad but is slightly worse off. This may be because I did not consider the asymptotic nature of the function, which would only be manifesting itself for large values of x. However, Gaussian quadrature methods require the function to be expressible in certain forms, which may not always be possible. They require prior knowledge of the function, its singularities, its asymptotic behaviour, etc, whereas scipy.quad manages to optimize function calls for all sorts of functions, without any additional information.
+</div>
+
+<hr class="footer"/>
+<div class="footer" id="generated-by">
+Document generated by <a href="http://elyxer.nongnu.org/">eLyXer 1.2.5 (2013-03-10)</a> on <span class="create-date">2017-09-25T22:34:19.358546</span>
+</div>
+</div>
+</body>
+</html>

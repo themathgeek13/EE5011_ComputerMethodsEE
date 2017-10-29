@@ -1,0 +1,1737 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+EE5011: Computer Methods in Electrical Engineering
+\end_layout
+
+\begin_layout Title
+Romberg Integration (Week 4)
+\end_layout
+
+\begin_layout Author
+Rohan Rao, EE14B118
+\end_layout
+
+\begin_layout Section
+Programming Assignment
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+I=\frac{2}{a^{2}}\intop_{0}^{a}J_{v}^{2}(\mathrm{\kappa r)rdr+\frac{2}{a^{2}}\left|\frac{J_{v}(\kappa a)}{K_{v}(\text{γa)}}\right|^{2}\int_{a}^{\text{∞}}K_{v}^{2}(\gamma r)rdr}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Transformation using the dimensionless variable 
+\begin_inset Formula $u=\frac{r}{a}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $u=\frac{r}{a}$
+\end_inset
+
+ means 
+\begin_inset Formula $r=a.u$
+\end_inset
+
+ and 
+\begin_inset Formula $dr=a.du$
+\end_inset
+
+, r=0 means u=0 and r=a means u=1
+\end_layout
+
+\begin_layout Standard
+On substituting,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+I=2\intop_{0}^{1}J_{v}^{2}(\mathrm{ku)udu+\frac{2}{a^{2}}\left|\frac{J_{v}(k)}{K_{v}(\text{g)}}\right|^{2}\int_{1}^{\text{∞}}K_{v}^{2}(gu)udu}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where k=
+\begin_inset Formula $\kappa a=2.7$
+\end_inset
+
+ and 
+\begin_inset Formula $g=\gamma a=1.2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Plot the integrand in Python
+\end_layout
+
+\begin_layout Standard
+The integrand is composed of two parts:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(u)=2*J_{v}^{2}(ku)*u
+\]
+
+\end_inset
+
+ for 
+\begin_inset Formula $0\leq u<1$
+\end_inset
+
+ and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(u)=2*\left|\frac{J_{v}^{2}(k)}{K_{v}^{2}(g)}\right|*K_{v}^{2}(gu)*u
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+for 
+\begin_inset Formula $1\leq u<\text{∞}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The plot of the function on a semi log scale (in u) is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fnplot.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+On a semi log scale in y = f(u) on the range [0.001,10] is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename fnplot_2.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above plot shows that beyond x=2 (approx), the function behaves like
+ an exponentially decaying function, and by the time x=10, the value has
+ dropped by 10 orders of magnitude.
+\end_layout
+
+\begin_layout Standard
+Code:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def func(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*u*sp.jv(3,2.7*u)**2   
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def func2(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*sp.kv(3,1.2*u)**2*u*abs(sp.jv(3,2.7)/sp.kv(3,1.2))**2
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def integrand(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    if u<1.0:                                                     
+\end_layout
+
+\begin_layout Plain Layout
+
+        return func(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+    else: 
+\end_layout
+
+\begin_layout Plain Layout
+
+		return func2(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+x=logspace(-3,7,200)
+\end_layout
+
+\begin_layout Plain Layout
+
+semilogx(x,integrand(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+title("Dielectric Fibre Electromagnetic Mode integrand function")
+\end_layout
+
+\begin_layout Plain Layout
+
+xlabel("Value of x ->")
+\end_layout
+
+\begin_layout Plain Layout
+
+ylabel("Value of function f(x) ->")
+\end_layout
+
+\begin_layout Plain Layout
+
+show()
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The function reaches a maximum value of nearly 0.13 at the point x=1.
+ This is not visible even in the plot above, since the logspace() function
+ defined above does not include the sample x=1.
+ This shows that even finer sampling will be required in that region.
+ The function is continuous, as can be verified from checking the value
+ from the above func() and func2() at x=1.
+ The function is not smooth at x=1 since it has a very sharp variation in
+ the second derivative, forming a discontinuity.
+ This will require a very small value of h when using trapzd integration.
+\end_layout
+
+\begin_layout Subsection
+Analytically evaluating the integral
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{\text{∞}}f(u)du
+\]
+
+\end_inset
+
+ The function func2() is the value of the integrand beyond u=1.
+ Writing it in the convenient form 
+\begin_inset Formula $f(u)=C*K_{v}(1.2u)*u$
+\end_inset
+
+, where 
+\begin_inset Formula $C=2*\left|\frac{J_{v}^{2}(k)}{K_{v}^{2}(k)}\right|,v=3,k=2.7,g=1.2$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $x\ggg v$
+\end_inset
+
+, 
+\begin_inset Formula $K_{v}(x)$
+\end_inset
+
+ can be approximated asymptotically by the function 
+\begin_inset Formula $\frac{\pi}{\sqrt{2\pi x}}e^{-x}$
+\end_inset
+
+.
+ Thus:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{\text{∞}}f(u)du=\int_{a}^{\text{∞}}\left(C*u*\frac{\pi}{\sqrt{2\pi*1.2u}}\exp(-1.2u)\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This simplifies to:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{\text{∞}}C_{2}\sqrt{u}\exp(-1.2u)du
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $C_{2}=C\sqrt{\frac{\pi}{2.4}}$
+\end_inset
+
+.
+ For large values of u, we can upper-bound the above integral by taking
+ 
+\begin_inset Formula $\sqrt{u}<\sqrt{100}<10.$
+\end_inset
+
+ Thus, from the above functions, since we can ascertain that the function
+ value will drop to below 
+\begin_inset Formula $10^{-107}$
+\end_inset
+
+ by u=100, we can bound the integral by using the above approximation.
+ The final form of the expression is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\int_{a}^{\text{∞}}f(u)du<\int_{a}^{\text{∞}}10.C_{2}\exp(-1.2u)du=\frac{10C_{2}}{1.2}\exp(-1.2a)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Substituting for C=0.00844 and 
+\begin_inset Formula $C_{2}=C\sqrt{\frac{\pi}{2.4}}$
+\end_inset
+
+ we get the value of the above expression as 0.08046*exp(-1.2a).
+ We can evaluate this for various values of 
+\begin_inset Quotes eld
+\end_inset
+
+a
+\begin_inset Quotes erd
+\end_inset
+
+ so as to obtain the point beyond which the above integration is below the
+ required tolerance of the problem.
+ For the purpose of the following set of questions, evaluating the function
+ at a=15 and a=20 gives values of the order of 
+\begin_inset Formula $10^{-9}$
+\end_inset
+
+ and 
+\begin_inset Formula $10^{-12}$
+\end_inset
+
+ respectively.
+ So, a=20 is sufficient for a required tolerance of 
+\begin_inset Formula $10^{-10}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Using scipy.integrate.quad to do the integration
+\end_layout
+
+\begin_layout Standard
+First of all, the exact value of the integral (derived analytically, provided
+ beforehand) is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def exact():
+\end_layout
+
+\begin_layout Plain Layout
+
+return sp.jv(3,2.7)**2-sp.jv(4,2.7)*sp.jv(2,2.7)+abs(sp.jv(3,2.7)/sp.kv(3,1.2))**2*(sp.kv(4
+,1.2)*sp.kv(2,1.2)-sp.kv(3,1.2)**2)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If we use scipy.integrate on the integrand function f(u) by considering x=20
+ as the upper limit of the integral described above, we get:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def func(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*u*sp.jv(3,2.7*u)**2   
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def func2(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*sp.kv(3,1.2*u)**2*u*abs(sp.jv(3,2.7)/sp.kv(3,1.2))**2
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def integrand(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    if u<1.0:                                                     
+\end_layout
+
+\begin_layout Plain Layout
+
+        return func(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+    else: 
+\end_layout
+
+\begin_layout Plain Layout
+
+		return func2(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+In: integrate.quad(integrand,0,20)
+\end_layout
+
+\begin_layout Plain Layout
+
+Out: (0.04603886028000008, 6.923921130885802e-09)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Upon turning on full_output=1, number of function evaluations required shows
+ as neval=567 for the upper limit of x=20.
+ The error between the obtained value and the exact analytic expression
+ can be obtained by subtracting exact().
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+In: integrate.quad(integrand,0,20,full_output=0)[0]-exact()
+\end_layout
+
+\begin_layout Plain Layout
+
+Out:1.3555823130673161e-13
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This shows that the upper limit of a=20 is sufficient for obtaining an accurate
+ answer.
+\end_layout
+
+\begin_layout Subsection
+Using trapzd from the Romberg module
+\end_layout
+
+\begin_layout Standard
+Using a global variable count and then calculating the number of function
+ calls in a trapzd loop, we get the following outputs:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+for i in range(1,20):
+\end_layout
+
+\begin_layout Plain Layout
+
+    s=r.trapzd(integrand,0,20,s,i)
+\end_layout
+
+\begin_layout Plain Layout
+
+    print "%1d %.15f %.2e"%(i,s,s-I0)
+\end_layout
+
+\begin_layout Plain Layout
+
+    print count
+\end_layout
+
+\begin_layout Plain Layout
+
+    count=0
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+Out: 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+ 2,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 1,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 2,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 4,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 16,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 32,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 64,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 128,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 256,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 512,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 1024,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 2048,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 4096,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 8192,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 16384,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 32768,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 65536,
+\end_layout
+
+\begin_layout Plain Layout
+
+ 131072
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+Out2:
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+1 0.000000000000000 -4.60e-02
+\end_layout
+
+\begin_layout Plain Layout
+
+2 0.000000000008383 -4.60e-02
+\end_layout
+
+\begin_layout Plain Layout
+
+3 0.000001289283323 -4.60e-02
+\end_layout
+
+\begin_layout Plain Layout
+
+4 0.000787977244362 -4.53e-02
+\end_layout
+
+\begin_layout Plain Layout
+
+5 0.044751328048882 -1.29e-03
+\end_layout
+
+\begin_layout Plain Layout
+
+6 0.029521687183219 -1.65e-02
+\end_layout
+
+\begin_layout Plain Layout
+
+7 0.046897366417297 8.59e-04
+\end_layout
+
+\begin_layout Plain Layout
+
+8 0.044868891255571 -1.17e-03
+\end_layout
+
+\begin_layout Plain Layout
+
+9 0.046056219282115 1.74e-05
+\end_layout
+
+\begin_layout Plain Layout
+
+10 0.045961594571426 -7.73e-05
+\end_layout
+
+\begin_layout Plain Layout
+
+11 0.046040763026165 1.90e-06
+\end_layout
+
+\begin_layout Plain Layout
+
+12 0.046034076754719 -4.78e-06
+\end_layout
+
+\begin_layout Plain Layout
+
+13 0.046038966706764 1.06e-07
+\end_layout
+
+\begin_layout Plain Layout
+
+14 0.046038560504368 -3.00e-07
+\end_layout
+
+\begin_layout Plain Layout
+
+15 0.046038867128737 6.85e-09
+\end_layout
+
+\begin_layout Plain Layout
+
+16 0.046038841556128 -1.87e-08
+\end_layout
+
+\begin_layout Plain Layout
+
+17 0.046038860704844 4.25e-10
+\end_layout
+
+\begin_layout Plain Layout
+
+18 0.046038859109436 -1.17e-09
+\end_layout
+
+\begin_layout Plain Layout
+
+19 0.046038860306469 2.66e-11
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The plot obtained (log-log plot due to large order variations):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename errorVScalls.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The overall trend shows that the function value is going down with increasing
+ number of function calls.
+ However, trapzd clearly requires 4-5 
+\series bold
+orders of magnitude
+\series default
+ 
+\series bold
+more 
+\series default
+function calls than scipy.integrate.quad to obtain the same accuracy of nearly
+ 
+\begin_inset Formula $10^{-10}$
+\end_inset
+
+, and with 512 function calls, its error is nearly 
+\begin_inset Formula $2*10^{-6}$
+\end_inset
+
+.
+ It makes a difference whether r=1 is included in the function evaluation,
+ since the function value around that point drops off extremely quickly
+ and hence the integral value will differ based on it.
+\end_layout
+
+\begin_layout Subsection
+Using qromb from the Romberg module
+\end_layout
+
+\begin_layout Standard
+The use of qromb over the interval (0, a=20) with a required tolerance of
+ 
+\begin_inset Formula $10^{-10}$
+\end_inset
+
+ gives the number of function calls as N=524289, 3 orders of magnitude greater
+ than scipy.quad.integrate.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+In: r.qromb(integrand,0,20,1e-10)
+\end_layout
+
+\begin_layout Plain Layout
+
+Out: (0.046038860123720424, -3.0025314137784918e-12, 524289)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The output of the following code will show how the error scales with the
+ number of function calls:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+In: for i in range(-1,-11,-1):
+\end_layout
+
+\begin_layout Plain Layout
+
+        print r.qromb(integrand,0,20,10**i)   
+\end_layout
+
+\begin_layout Plain Layout
+
+Out:
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.06453069939527602, 0.00024762829418648665, 17)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.06453069939527602, 0.00024762829418648665, 17)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.04666239432307808, 1.2538441623417591e-05, 257)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.04588102573376104, -3.003242764428245e-06, 513)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.04602855383209874, -1.9770401457648317e-07, 2049)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.04603822202670924, -1.2278888980499384e-08, 8193)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.04603902020149272, 3.069905837882252e-09, 16385)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.04603887027120843, 1.9222654805821073e-10, 65537)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.046038860904377095, 1.2008630269232545e-11, 262145)
+\end_layout
+
+\begin_layout Plain Layout
+
+(0.046038860123720424, -3.0025314137784918e-12, 524289)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename qromb_errvscalls.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This plot shows that the error drops by an order of magnitude (log-log plot)
+ with an order of magnitude increase in number of function calls.
+\end_layout
+
+\begin_layout Subsection
+Split integral into (0,1) and (1,20) parts
+\end_layout
+
+\begin_layout Standard
+On splitting the integral into (0,1) and (1,20) parts, a considerably smaller
+ number of function calls are required to obtain the same accuracy, and
+ even far beyond the required accuracy.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+counts=[]
+\end_layout
+
+\begin_layout Plain Layout
+
+errors=[]
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(-1,-11,-1):
+\end_layout
+
+\begin_layout Plain Layout
+
+    x1=r.qromb(integrand,0,1,10**i)
+\end_layout
+
+\begin_layout Plain Layout
+
+    x2=r.qromb(integrand,1,20,10**i)
+\end_layout
+
+\begin_layout Plain Layout
+
+    print x1[0]+x2[0],x1[0]+x2[0]-exact(),x1[2]+x2[2]
+\end_layout
+
+\begin_layout Plain Layout
+
+    counts.append(x1[2]+x2[2])
+\end_layout
+
+\begin_layout Plain Layout
+
+    errors.append(abs(x1[0]+x2[0]-exact()))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+loglog(counts, errors)
+\end_layout
+
+\begin_layout Plain Layout
+
+title("Error vs number of function calls (split 0-1 and 1-20)")
+\end_layout
+
+\begin_layout Plain Layout
+
+xlabel("Number of function calls")
+\end_layout
+
+\begin_layout Plain Layout
+
+ylabel("Error in integration")
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename qromb_errvscalls_split.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The plot above has a much steeper slope as compared to the naive Romberg
+ integration being applied on the full interval (0,20).
+ This is a result of correctly using the information of the sharp peak at
+ x=1 for splitting the integral to obtain a more precise numerical solution.
+ The comparison on the same plot is given below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename comparison.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Implementation of qromb using trapzd and polint
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import romberg as r
+\end_layout
+
+\begin_layout Plain Layout
+
+global count=0
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def func(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*u*sp.jv(3,2.7*u)**2   
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def func2(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*sp.kv(3,1.2*u)**2*u*abs(sp.jv(3,2.7)/sp.kv(3,1.2))**2
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def integrand(u):
+\end_layout
+
+\begin_layout Plain Layout
+
+	global count; count+=1;
+\end_layout
+
+\begin_layout Plain Layout
+
+    if u<1.0:                                                     
+\end_layout
+
+\begin_layout Plain Layout
+
+        return func(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+    else: 
+\end_layout
+
+\begin_layout Plain Layout
+
+		return func2(u)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+order=5
+\end_layout
+
+\begin_layout Plain Layout
+
+s_out=0.0
+\end_layout
+
+\begin_layout Plain Layout
+
+xx=[]; yy=[]	//polynomial is a function of h^2 and not h
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1,order+1):
+\end_layout
+
+\begin_layout Plain Layout
+
+    s_out=r.trapzd(integrand,0,20,s_out,i)
+\end_layout
+
+\begin_layout Plain Layout
+
+    xx.append((20.0/(2**(i-1)))**2)
+\end_layout
+
+\begin_layout Plain Layout
+
+    yy.append(s_out)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+y,err=r.polint(xx,yy,0)	//extrapolation to h=0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Varying order of qromb vs number of function calls
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename rombergCalls.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As can be seen from the semilog plot above, the number of calls decreases
+ from n=5 to n=11, then increases beyond that, for a fixed tolerance of
+ 
+\begin_inset Formula $10^{-8}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Spline Integration using B-Spline from scipy
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename splineErr.png
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+This plot shows that the error drops by an order of magnitude (log-log plot)
+ with an order of magnitude increase in number of function calls.
+ Spline interpolation of the function forces it to consider the kink at
+ x=1 as an n-th order smooth polynomial, thus reducing the accuracy of the
+ fit.
+ As more points are included, the value around x=1 is sampled even more
+ closely, thus improving the accuracy, but not actually addressing the problem,
+ that is the kink at x=1.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+In 	 : for i in range(4,20):
+\end_layout
+
+\begin_layout Plain Layout
+
+   .....:     x=linspace(0,20,2**i)
+\end_layout
+
+\begin_layout Plain Layout
+
+   .....:     y=integrand(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+   .....:     tck=si.splrep(x,y)
+\end_layout
+
+\begin_layout Plain Layout
+
+   .....:     I=si.splint(0,20,tck)
+\end_layout
+
+\begin_layout Plain Layout
+
+   .....:     print I-exact()
+\end_layout
+
+\begin_layout Plain Layout
+
+   .....:     err.append(abs(I-exact()))
+\end_layout
+
+\begin_layout Plain Layout
+
+   .....:     
+\end_layout
+
+\begin_layout Plain Layout
+
+Out:
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+-0.00469338304051
+\end_layout
+
+\begin_layout Plain Layout
+
+-0.0200338967057
+\end_layout
+
+\begin_layout Plain Layout
+
+0.00456726068437
+\end_layout
+
+\begin_layout Plain Layout
+
+-0.000966336076695
+\end_layout
+
+\begin_layout Plain Layout
+
+-9.77496443497e-05
+\end_layout
+
+\begin_layout Plain Layout
+
+-8.51200801124e-05
+\end_layout
+
+\begin_layout Plain Layout
+
+1.04082882958e-05
+\end_layout
+
+\begin_layout Plain Layout
+
+-3.96607022308e-06
+\end_layout
+
+\begin_layout Plain Layout
+
+-3.43103425497e-07
+\end_layout
+
+\begin_layout Plain Layout
+
+-3.30422590164e-07
+\end_layout
+
+\begin_layout Plain Layout
+
+4.00474137047e-08
+\end_layout
+
+\begin_layout Plain Layout
+
+-1.55316829675e-08
+\end_layout
+
+\begin_layout Plain Layout
+
+-1.33063099428e-09
+\end_layout
+
+\begin_layout Plain Layout
+
+-1.29013279226e-09
+\end_layout
+
+\begin_layout Plain Layout
+
+1.56270989204e-10
+\end_layout
+
+\begin_layout Plain Layout
+
+-6.07057945579e-11
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Split into two parts (0,1) and (1,20) and then use splint
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+for i in range(4,20):
+\end_layout
+
+\begin_layout Plain Layout
+
+    x1=linspace(0,1,2**(i-1))
+\end_layout
+
+\begin_layout Plain Layout
+
+    y1=integrand(x1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    tck1=si.splrep(x1,y1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    I1=si.splint(0,1,tck1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    x2=linspace(1,20,2**(i-1))
+\end_layout
+
+\begin_layout Plain Layout
+
+    y2=integrand(x2)
+\end_layout
+
+\begin_layout Plain Layout
+
+    tck2=si.splrep(x2,y2)
+\end_layout
+
+\begin_layout Plain Layout
+
+    I2=si.splint(1,20,tck2)
+\end_layout
+
+\begin_layout Plain Layout
+
+    print I1+I2-exact()
+\end_layout
+
+\begin_layout Plain Layout
+
+    err.append(abs(I1+I2-exact()))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above code snippet splits the function into two parts, one before 1
+ and one after 1.
+ The number of points for a given evaluation remains the same as before
+ (half the points are used before 1, and half are used after 1: this could
+ have been made as 1/20 before 1 and 19/20 after 1 as well).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename splineErr_withSplit.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above graph decays much faster than the previously obtained graph.
+ This can be seen from the image below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename comparison_splint.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The green line is obtained when the function is split over the two intervals,
+ whereas the blue one is obtained when considering a single interval (0,20).
+ This shows that spline fitting/integration gives a better result when discontin
+uities or irregularities/kinks of the function are excluded/split.
+ This allows us to separately fit the individual halves of the function
+ and thus obtain a better fit.
+\end_layout
+
+\begin_layout Subsection
+Custom 3-point trapzd function for Romberg
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def trap3(func, a, b, n):
+\end_layout
+
+\begin_layout Plain Layout
+
+    if(n==1):
+\end_layout
+
+\begin_layout Plain Layout
+
+        return 0.5*(b-a)*(func(a)+func(b))
+\end_layout
+
+\begin_layout Plain Layout
+
+    else:
+\end_layout
+
+\begin_layout Plain Layout
+
+        d = (float)(b-a)/3**(n-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+        sum=0.0
+\end_layout
+
+\begin_layout Plain Layout
+
+        x=a+d
+\end_layout
+
+\begin_layout Plain Layout
+
+        while(x<b):
+\end_layout
+
+\begin_layout Plain Layout
+
+            sum+=func(x)*d; x+=d;
+\end_layout
+
+\begin_layout Plain Layout
+
+        sum+=0.5*d*(func(a)+func(b))
+\end_layout
+
+\begin_layout Plain Layout
+
+        return sum
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above function trap3 as defined in Python implements a trapezoidal integrati
+on algorithm by splitting by 3 each time, meaning that for n=1 the points
+ considered are x=a and x=b, but for n=2, the two points between a,b that
+ are equidistant from the ends are considered.
+ The interval is divided into three.
+ Similarly, for n=3, the interval is divided into 9 equal parts.
+ And so on.
+ The above function is not optimized, and also does not use any logic for
+ utilizing previously used points.
+ As a result, it will require approximately twice the number of function
+ evaluations for the same accuracy.
+\end_layout
+
+\begin_layout Standard
+Implementing Romberg using the above function simply requires the use of
+ polint on a set of values obtained from above.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+xx=[]; yy=[]
+\end_layout
+
+\begin_layout Plain Layout
+
+order=12
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1,order+1):
+\end_layout
+
+\begin_layout Plain Layout
+
+	xx.append((20.0/3**(i-1)**2)
+\end_layout
+
+\begin_layout Plain Layout
+
+	yy.append(trap3(integrand,0,20,i))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+y,err=r.polint(xx,yy,0)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Use of the above code snippet gives an error y-exact() as 
+\begin_inset Formula $3.4766x10^{-10}$
+\end_inset
+
+, and requires N=265741 calls to the function 
+\begin_inset Quotes eld
+\end_inset
+
+integrand
+\begin_inset Quotes erd
+\end_inset
+
+.
+ From section 1.6, it is seen that the qromb function in the romberg module
+ requires 524289 function calls for a similar order tolerance.
+ This is about 2 times more than that required for the 3-point Romberg as
+ programmed above, which does not even consider logic for utilizing previously
+ used points.
+\end_layout
+
+\end_body
+\end_document
