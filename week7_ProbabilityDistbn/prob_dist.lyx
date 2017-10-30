@@ -1,0 +1,479 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+EE5011: Random Number Generation
+\end_layout
+
+\begin_layout Author
+Rohan Rao, EE14B118
+\end_layout
+
+\begin_layout Section
+Programming Assignment
+\end_layout
+
+\begin_layout Subsection
+Implement a function to generate normally distributed numbers
+\end_layout
+
+\begin_layout Standard
+The Box-Muller transform is a pseudo-random number sampling method for generatin
+g pairs of independent, standard, normally distributed (0 mean, 1 variance)
+ random numbers from uniformly distributed random numbers.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Z_{0}=Rcos(\theta)=\sqrt{-2lnU_{1}}cos(2\pi U_{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Z_{1}=Rsin(\theta)=\sqrt{-2lnU_{1}}sin(2\pi U_{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\begin_inset Formula $U_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $U_{2}$
+\end_inset
+
+ are independent random variables uniformly distributed on the interval
+ (0,1).
+\end_layout
+
+\begin_layout Standard
+Then 
+\begin_inset Formula $Z_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $Z_{2}$
+\end_inset
+
+ are independent random variables with a standard normal distribution.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def normaldist():
+\end_layout
+
+\begin_layout Plain Layout
+
+     a,b=np.random.rand(2)
+\end_layout
+
+\begin_layout Plain Layout
+
+     c=np.sqrt(-2*np.log(a))*np.cos(2*np.pi*b)
+\end_layout
+
+\begin_layout Plain Layout
+
+     d=np.sqrt(-2*np.log(a))*np.sin(2*np.pi*b)
+\end_layout
+
+\begin_layout Plain Layout
+
+     return c,d
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The histogram generated from this distribution is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename gaussian_pdf.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Poisson arrival
+\end_layout
+
+\begin_layout Standard
+Using the Inverse Transform Technique to obtain a random variable sampled
+ from the given probability distribution, we have:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+p(t)=e^{-t}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus, the CDF can be obtained as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+P(t)=y=\intop_{-\infty}^{t}p(t)dt=1-e^{-t}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This can be solved for 
+\begin_inset Quotes eld
+\end_inset
+
+t
+\begin_inset Quotes erd
+\end_inset
+
+ in terms of y, where y is a uniform RV and t is the desired RV.
+\end_layout
+
+\begin_layout Standard
+This gives 
+\begin_inset Formula $y=1-e^{-t}$
+\end_inset
+
+ or 
+\begin_inset Formula $t=-ln(1-y)$
+\end_inset
+
+.
+ This can then be used for obtaining random deviates from the given probability
+ distribution 
+\begin_inset Formula $p(t)$
+\end_inset
+
+.
+ The following function can be used for getting the time for packet 30:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def p30():
+\end_layout
+
+\begin_layout Plain Layout
+
+	t=0
+\end_layout
+
+\begin_layout Plain Layout
+
+	for i in range(30):	
+\end_layout
+
+\begin_layout Plain Layout
+
+		t-=np.log(np.random.rand())
+\end_layout
+
+\begin_layout Plain Layout
+
+	return t
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This experiment can be run 100 times, and the histogram for arrival of the
+ 30th packet is as below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename poisson_P30.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This approximately follows a Bernoulli distribution, as expected for a Poisson
+ process.
+ Increasing the number of trials beyond 100 gives a more accurate representation
+ of the phenomenon.
+\end_layout
+
+\begin_layout Subsection
+Interesting Function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(x,y)=u^{2}+v^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left(\begin{array}{c}
+u\\
+v
+\end{array}\right)=\left(\begin{array}{cc}
+cos\alpha & sin\alpha\\
+-sin\alpha & cos\alpha
+\end{array}\right)\left(\begin{array}{c}
+x\\
+y
+\end{array}\right)-\left(\begin{array}{c}
+0.5\\
+0.5
+\end{array}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\alpha=\pi sin(10(\sqrt{x^{2}+y^{2}}-0.5))
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Implement the function in Python
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def u(x,y):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     alpha=np.pi*np.sin(10*(sqrt(x**2+y**2)-0.5))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     u=x*cos(alpha)+y*sin(alpha)-0.5
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return u
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def v(x,y):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     alpha=np.pi*np.sin(10*(sqrt(x**2+y**2)-0.5))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     v=-x*sin(alpha)+y*cos(alpha)-0.5
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return v
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def f(x,y):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return u(x,y)**2+v(x,y)**2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Contour Plot and Surface Plot of the function
+\end_layout
+
+\begin_layout Standard
+The function contour plot over the xlimits of (-2,2) and ylimits of (-2,2)
+ is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename contour_plot.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The surface plot looks as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 3dSurfacePlot.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finally, the region of interest (|f|<1) is marked below (lies within the
+ -2<x,y<2 rectangle):
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename RoI_contour.png
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

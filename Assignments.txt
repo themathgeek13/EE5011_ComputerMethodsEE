@@ -1,0 +1,8 @@
+Week0) SciPy basics/walkthrough
+Week1) Polynomial Interpolation
+Week2) Spline Interpolation
+Week3) Romberg Integration -> 1,2 split
+Week4) Open Romberg and Gaussian Quadratures
+Week5) Function Fitting -> 1) Chebyshev Fitting, 2) Unstable Series summing
+Week6) Probability Distributions
+Week7) 1) 1-D Root Finding & Minimization, 2) n-D minimization
