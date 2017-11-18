@@ -174,6 +174,19 @@ def normaldist():
 
 \end_layout
 
+\begin_layout Standard
+The histogram generated from this distribution is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename gaussian_pdf.png
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Poisson arrival
 \end_layout
@@ -297,17 +310,14 @@ This approximately follows a Bernoulli distribution, as expected for a Poisson
 \end_layout
 
 \begin_layout Subsection
-Five functions
-\end_layout
-
-\begin_layout Subsubsection
-Fitting the function f(x) using 200 points in the range [-1,1] and 15 coefficien
-ts for the Chebyshev series gives the following plot:
+Interesting Function
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/fx_err.png
+\begin_inset Formula 
+\[
+f(x,y)=u^{2}+v^{2}
+\]
 
 \end_inset
 
@@ -315,35 +325,22 @@ ts for the Chebyshev series gives the following plot:
 \end_layout
 
 \begin_layout Standard
-The maximum error over the interval is of the order of 
-\begin_inset Formula $10^{-15}.$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Fitting the function u(x) using 200 points in the range [-1,1] and 30 coefficien
-ts for the Chebyshev series:
-\end_layout
-
-\begin_layout Standard
-The function 
-\begin_inset Formula $u(x)=e^{-|x|}$
-\end_inset
-
- is not easily approximated over the full interval by a single polynomial
- set.
- The use of 30 coefficients still gives an error of 
-\begin_inset Formula $\sim10^{-3}$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/ux_30.png
+\begin_inset Formula 
+\[
+\left(\begin{array}{c}
+u\\
+v
+\end{array}\right)=\left(\begin{array}{cc}
+cos\alpha & sin\alpha\\
+-sin\alpha & cos\alpha
+\end{array}\right)\left(\begin{array}{c}
+x\\
+y
+\end{array}\right)-\left(\begin{array}{c}
+0.5\\
+0.5
+\end{array}\right)
+\]
 
 \end_inset
 
@@ -351,238 +348,18 @@ The function
 \end_layout
 
 \begin_layout Standard
-When considering the split intervals of [-1,0) and (0,1] we get a significantly
- better result with just 15 coefficients for [-1,0):
-\end_layout
+\begin_inset Formula 
+\[
+\alpha=\pi sin(10(\sqrt{x^{2}+y^{2}}-0.5))
+\]
 
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/ux_15_neg.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The discontinuties are due to an error of exactly zero on a semilog plot.
-\end_layout
-
-\begin_layout Standard
-Similarly, for positive values of x, the 15 coefficient plot is below:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/ux_15_pos.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This shows that splitting the function u(x) into two intervals and fitting
- each separately correctly removes the kink in the function at x=0 and allows
- it to be fitted properly.
-\end_layout
-
-\begin_layout Subsubsection
-Fitting the function v(x) using 200 points in the range [-1,1] and 30 coefficien
-ts for the Chebyshev series:
-\end_layout
-
-\begin_layout Standard
-The function v(x) has a branch cut discontinuity at x=-1.1, which is outside
- the range [-1,1] but still causes the number of coefficients required to
- increase significantly.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/vx_30.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The plot above shows that using 30 coefficients gives an error of the order
- of 
-\begin_inset Formula $10^{-8}.$
-\end_inset
-
- The use of 15 coefficients gives an error of the order 
-\begin_inset Formula $10^{-6}.$
 \end_inset
 
 
 \end_layout
 
 \begin_layout Subsubsection
-Fitting the function g(x) for different values of delta and 200 points in
- range [-1,1]:
-\end_layout
-
-\begin_layout Standard
-For delta=0.1, 200 points are insufficient for obtaining an error of being
- 0.1 even by taking upto 50 coefficients.
-\end_layout
-
-\begin_layout Standard
-For delta=1, about 15 terms are required for an error of order 
-\begin_inset Formula $10^{-6}$
-\end_inset
-
-:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/gx_del1.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=10, a significantly smaller number of terms (N=7) is required
- for very high accuracy:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/gx_del10.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=100, just 3 terms are necessary for such accuracy:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/gx_del100.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This shows that the smoother the function becomes over the interval, the
- more easily it can be approximated by a Chebyshev fit.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/g(x01).png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=0.1
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/g(x1).png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=1
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/g(x10).png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=10
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/g(x100).png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=100
-\end_layout
-
-\begin_layout Subsubsection
-Fitting the function h(x) for different values of delta and 200 points in
- range [-1,1]:
-\end_layout
-
-\begin_layout Standard
-For delta=1, with 20 coefficients:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/h(x1).png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=10, with 15 coefficients:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/h(x10).png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-For delta=100, with 10 coefficients:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/h(x1000.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Plotting h(x) for different values of delta shows that small values of delta
- force the function to have sharp kinks at the edges of the interval, thus
- requiring significantly more coefficients for the Chebyshev series to converge.
-\end_layout
-
-\begin_layout Subsection
-Fourier function fitting
+Implement the function in Python
 \end_layout
 
 \begin_layout Standard
@@ -592,7 +369,22 @@ status open
 
 \begin_layout Plain Layout
 
-from scipy.integrate import quad
+def u(x,y):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     alpha=np.pi*np.sin(10*(sqrt(x**2+y**2)-0.5))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     u=x*cos(alpha)+y*sin(alpha)-0.5
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return u
 \end_layout
 
 \begin_layout Plain Layout
@@ -601,12 +393,22 @@ from scipy.integrate import quad
 
 \begin_layout Plain Layout
 
-def f1(x,m):
+def v(x,y):
 \end_layout
 
 \begin_layout Plain Layout
 
-	return f(x)*cos(m*(x+1)*np.pi/2)
+     ...:     alpha=np.pi*np.sin(10*(sqrt(x**2+y**2)-0.5))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     v=-x*sin(alpha)+y*cos(alpha)-0.5
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return v
 \end_layout
 
 \begin_layout Plain Layout
@@ -615,27 +417,12 @@ def f1(x,m):
 
 \begin_layout Plain Layout
 
-def fouriercoeffs(f1,N):
+def f(x,y):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:     fcoeff=[]
-\end_layout
-
-\begin_layout Plain Layout
-
-     ...:     for i in range(N):
-\end_layout
-
-\begin_layout Plain Layout
-
-     ...:         fcoeff.append(quad(f1,-1,1,args=(i))[0])
-\end_layout
-
-\begin_layout Plain Layout
-
-     ...:     return np.array(fcoeff)
+     ...:     return u(x,y)**2+v(x,y)**2
 \end_layout
 
 \end_inset
@@ -643,13 +430,18 @@ def fouriercoeffs(f1,N):
 
 \end_layout
 
+\begin_layout Subsubsection
+Contour Plot and Surface Plot of the function
+\end_layout
+
 \begin_layout Standard
-Plots of fouriercoeffs for N=100 are as follows:
+The function contour plot over the xlimits of (-2,2) and ylimits of (-2,2)
+ is as follows:
 \end_layout
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/hx_fourier.png
+	filename contour_plot.png
 
 \end_inset
 
@@ -657,15 +449,12 @@ Plots of fouriercoeffs for N=100 are as follows:
 \end_layout
 
 \begin_layout Standard
-Clearly, since h(x) is periodic, it is able to be approximated well by a
- Fourier fit.
- The value of delta influences how quickly the series converges, with larger
- delta converging more quickly than small delta.
+The surface plot looks as follows:
 \end_layout
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/gx_fourier.png
+	filename 3dSurfacePlot.png
 
 \end_inset
 
@@ -673,13 +462,185 @@ Clearly, since h(x) is periodic, it is able to be approximated well by a
 \end_layout
 
 \begin_layout Standard
-g(x) does not converge quickly, having well over 100 coefficients for various
- values of delta.
+Finally, the region of interest (|f|<1) is marked below (lies within the
+ -2<x,y<2 rectangle):
 \end_layout
 
 \begin_layout Standard
 \begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/vx_fourier.png
+	filename RoI_contour.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Monte Carlo Integration
+\end_layout
+
+\begin_layout Standard
+By using sampling-based integration for obtaining the area of the region
+ of interest, we can use the upper bound function |Z|=1 and the limits 
+\begin_inset Formula $-2<x,y<2$
+\end_inset
+
+.
+ The points x,y are chosen uniformly on their intervals, and then the value
+ of f(x,y) is computed.
+ If the value is below 1, it is considered to be inside the region of interest.
+ The total area under consideration is -2<x,y<2, or a total area of 16 units.
+ This is multiplied to obtain the area within the region of interest as
+ 3.142 units.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+countin = 0
+\end_layout
+
+\begin_layout Plain Layout
+
+countout = 0
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1000000):
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     a,b=np.random.rand(2)*4-2
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     c=f(a,b)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     if abs(c)<1:
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:         countin+=1
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     else:
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:         countout+=1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+In [78]: countin/float(countin+countout)
+\end_layout
+
+\begin_layout Plain Layout
+
+Out[78]: 0.196376
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+In [79]: 16*countin/float(countin+countout)
+\end_layout
+
+\begin_layout Plain Layout
+
+Out[79]: 3.142016
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Poisson Point Process
+\end_layout
+
+\begin_layout Standard
+A Poisson point process is a stochastic process wherein the number of arrivals
+ per unit time is defined by the arrival rate 
+\begin_inset Formula $\lambda$
+\end_inset
+
+.
+ The inter-arrival times are exponentially distributed with mean 
+\begin_inset Formula $1/\lambda$
+\end_inset
+
+.
+ The PDF is 
+\begin_inset Formula $f(t)=\lambda\exp(-\lambda t)$
+\end_inset
+
+, and the CDF is 
+\begin_inset Formula $F(t)=1-\exp(-\lambda t)$
+\end_inset
+
+.
+ By using the inverse CDF method, we can obtain the required probability
+ distribution by using:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $-log(1-U)/\lambda=-log(U)/\lambda$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Python provides a function to generate exponentially distributed random
+ numbers using the above technique:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import random
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1,10):
+\end_layout
+
+\begin_layout Plain Layout
+
+   print random.expovariate(15)
+\end_layout
 
 \end_inset
 
@@ -687,38 +648,42 @@ g(x) does not converge quickly, having well over 100 coefficients for various
 \end_layout
 
 \begin_layout Standard
-The magnitude of the coefficients of v(x) drop exponentially, but still
- are of the order of 
-\begin_inset Formula $10^{-4}$
+The arrival times can be obtained by summing to a moving time variable:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import random
+\end_layout
+
+\begin_layout Plain Layout
+
+t= 0
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1,10):
+\end_layout
+
+\begin_layout Plain Layout
+
+   t+= random.expovariate(15)
+\end_layout
+
+\begin_layout Plain Layout
+
+   print t
+\end_layout
+
 \end_inset
 
- at N=100.
-\end_layout
 
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/fx_fourier.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The coefficients of f(x) also drop in magnitude similar to v(x).
-\end_layout
-
-\begin_layout Standard
-\begin_inset Graphics
-	filename ../week5,6_ChebyshevFit&UnstableSeriesSum/ux_fourier.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The coefficients of u(x) also don't quickly decay with N.
 \end_layout
 
 \end_body

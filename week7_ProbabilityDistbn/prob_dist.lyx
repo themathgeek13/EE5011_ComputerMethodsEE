@@ -475,5 +475,217 @@ Finally, the region of interest (|f|<1) is marked below (lies within the
 
 \end_layout
 
+\begin_layout Subsubsection
+Monte Carlo Integration
+\end_layout
+
+\begin_layout Standard
+By using sampling-based integration for obtaining the area of the region
+ of interest, we can use the upper bound function |Z|=1 and the limits 
+\begin_inset Formula $-2<x,y<2$
+\end_inset
+
+.
+ The points x,y are chosen uniformly on their intervals, and then the value
+ of f(x,y) is computed.
+ If the value is below 1, it is considered to be inside the region of interest.
+ The total area under consideration is -2<x,y<2, or a total area of 16 units.
+ This is multiplied to obtain the area within the region of interest as
+ 3.142 units.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+countin = 0
+\end_layout
+
+\begin_layout Plain Layout
+
+countout = 0
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1000000):
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     a,b=np.random.rand(2)*4-2
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     c=f(a,b)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     if abs(c)<1:
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:         countin+=1
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:     else:
+\end_layout
+
+\begin_layout Plain Layout
+
+    ...:         countout+=1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+In [78]: countin/float(countin+countout)
+\end_layout
+
+\begin_layout Plain Layout
+
+Out[78]: 0.196376
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+In [79]: 16*countin/float(countin+countout)
+\end_layout
+
+\begin_layout Plain Layout
+
+Out[79]: 3.142016
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Poisson Point Process
+\end_layout
+
+\begin_layout Standard
+A Poisson point process is a stochastic process wherein the number of arrivals
+ per unit time is defined by the arrival rate 
+\begin_inset Formula $\lambda$
+\end_inset
+
+.
+ The inter-arrival times are exponentially distributed with mean 
+\begin_inset Formula $1/\lambda$
+\end_inset
+
+.
+ The PDF is 
+\begin_inset Formula $f(t)=\lambda\exp(-\lambda t)$
+\end_inset
+
+, and the CDF is 
+\begin_inset Formula $F(t)=1-\exp(-\lambda t)$
+\end_inset
+
+.
+ By using the inverse CDF method, we can obtain the required probability
+ distribution by using: [SOURCE: https://stackoverflow.com/questions/1155539/how-
+do-i-generate-a-poisson-process]
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $-log(1-U)/\lambda=-log(U)/\lambda$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Python provides a function to generate exponentially distributed random
+ numbers using the above technique:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import random
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1,10):
+\end_layout
+
+\begin_layout Plain Layout
+
+   print random.expovariate(15)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The arrival times can be obtained by summing to a moving time variable:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import random
+\end_layout
+
+\begin_layout Plain Layout
+
+t= 0
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1,10):
+\end_layout
+
+\begin_layout Plain Layout
+
+   t+= random.expovariate(15)
+\end_layout
+
+\begin_layout Plain Layout
+
+   print t
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document

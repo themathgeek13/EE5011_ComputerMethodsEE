@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="GENERATOR" content="LyX 2.2.3" />
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<title>EE5011: Random Number Generation</title>
+<style type='text/css'>
+/* Layout-provided Styles */
+h1.title {
+font-size: x-large;
+margin-bottom: 1ex;
+text-align: center;
+
+}
+div.author {
+font-size: large;
+margin-top: 1.3ex;
+margin-bottom: 0.7ex;
+text-align: center;
+
+}
+h2.section {
+font-weight: bold;
+font-size: x-large;
+margin-top: 1.3ex;
+margin-bottom: 0.7ex;
+text-align: left;
+
+}
+h3.subsection {
+font-weight: bold;
+font-size: large;
+margin-top: 0.9ex;
+margin-bottom: 0.5ex;
+text-align: left;
+
+}
+div.standard {
+margin-bottom: 2ex;
+}
+div.plain_layout {
+text-align: left;
+
+}
+h4.subsubsection {
+font-weight: bold;
+font-size: medium;
+margin-top: 0.7ex;
+margin-bottom: 0.4ex;
+text-align: left;
+
+}
+div.float-listings {
+border: 2px solid black;
+padding: 1ex;
+margin: 1ex;
+}
+div.listings-caption {
+text-align: center;
+border: 2px solid black;
+padding: 1ex;
+margin: 1ex;
+}
+
+
+</style>
+</head>
+<body dir="auto">
+<h1 class="title"><a id='magicparlabel-1' />EE5011: Random Number Generation</h1>
+<div class="author"><a id='magicparlabel-2' />Rohan Rao, EE14B118</div>
+<h2 class="section"><a id='magicparlabel-3' /><span class="section_label">1</span> Programming Assignment</h2>
+<h3 class="subsection"><a id='magicparlabel-4' /><span class="subsection_label">1.1</span> Implement a function to generate normally distributed numbers</h3>
+<div class="standard"><a id='magicparlabel-5' />The Box-Muller transform is a pseudo-random number sampling method for generating pairs of independent, standard, normally distributed (0 mean, 1 variance) random numbers from uniformly distributed random numbers.</div>
+
+<div class="standard"><a id='magicparlabel-6' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow><mn>0</mn>
+    </mrow>
+   </msub><mo>=</mo><mi>R</mi><mi>c</mi><mi>o</mi><mi>s</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi> &theta; </mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <msqrt>
+    <mrow><mo>-</mo><mn>2</mn><mi>l</mi><mi>n</mi>
+     <msub>
+      <mrow><mi>U</mi>
+      </mrow>
+      <mrow><mn>1</mn>
+      </mrow>
+     </msub>
+    </mrow>
+   </msqrt><mi>c</mi><mi>o</mi><mi>s</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mn>2</mn><mi> &pi; </mi>
+    <msub>
+     <mrow><mi>U</mi>
+     </mrow>
+     <mrow><mn>2</mn>
+     </mrow>
+    </msub>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-7' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow><mn>1</mn>
+    </mrow>
+   </msub><mo>=</mo><mi>R</mi><mi>s</mi><mi>i</mi><mi>n</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi> &theta; </mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <msqrt>
+    <mrow><mo>-</mo><mn>2</mn><mi>l</mi><mi>n</mi>
+     <msub>
+      <mrow><mi>U</mi>
+      </mrow>
+      <mrow><mn>1</mn>
+      </mrow>
+     </msub>
+    </mrow>
+   </msqrt><mi>s</mi><mi>i</mi><mi>n</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mn>2</mn><mi> &pi; </mi>
+    <msub>
+     <mrow><mi>U</mi>
+     </mrow>
+     <mrow><mn>2</mn>
+     </mrow>
+    </msub>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-8' />Here, <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow><mi>U</mi>
+   </mrow>
+   <mrow><mn>1</mn>
+   </mrow>
+  </msub>
+ </mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow><mi>U</mi>
+   </mrow>
+   <mrow><mn>2</mn>
+   </mrow>
+  </msub>
+ </mrow></math> are independent random variables uniformly distributed on the interval (0,1).</div>
+
+<div class="standard"><a id='magicparlabel-9' />Then <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow><mi>Z</mi>
+   </mrow>
+   <mrow><mn>1</mn>
+   </mrow>
+  </msub>
+ </mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow><mi>Z</mi>
+   </mrow>
+   <mrow><mn>2</mn>
+   </mrow>
+  </msub>
+ </mrow></math> are independent random variables with a standard normal distribution.</div>
+
+
+<div class='float-listings'><pre class ='listings'>def normaldist():
+     a,b=np.random.rand(2)
+     c=np.sqrt(-2*np.log(a))*np.cos(2*np.pi*b)
+     d=np.sqrt(-2*np.log(a))*np.sin(2*np.pi*b)
+     return c,d</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-19' />The histogram generated from this distribution is as follows:</div>
+
+<div class="standard"><a id='magicparlabel-20' /><img src='0C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_gaussian_pdf.png' alt='image: 0C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_gaussian_pdf.png' />
+</div>
+<h3 class="subsection"><a id='magicparlabel-21' /><span class="subsection_label">1.2</span> Poisson arrival</h3>
+<div class="standard"><a id='magicparlabel-22' />Using the Inverse Transform Technique to obtain a random variable sampled from the given probability distribution, we have:</div>
+
+<div class="standard"><a id='magicparlabel-23' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>p</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>t</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <msup>
+    <mrow><mi>e</mi>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mi>t</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-24' />Thus, the CDF can be obtained as follows:</div>
+
+<div class="standard"><a id='magicparlabel-25' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>P</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>t</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mi>y</mi><mo>=</mo>
+   <msubsup>
+    <mrow><mo> &int; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mi> &infin; </mi>
+     </mrow>
+    </mrow>
+    <mrow><mi>t</mi>
+    </mrow>
+   </msubsup><mi>p</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>t</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mi>d</mi><mi>t</mi><mo>=</mo><mn>1</mn><mo>-</mo>
+   <msup>
+    <mrow><mi>e</mi>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mi>t</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-26' />This can be solved for &ldquo;t&rdquo; in terms of y, where y is a uniform RV and t is the desired RV.</div>
+
+<div class="standard"><a id='magicparlabel-27' />This gives <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>y</mi><mo>=</mo><mn>1</mn><mo>-</mo>
+   <msup>
+    <mrow><mi>e</mi>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mi>t</mi>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math> or <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>t</mi><mo>=</mo><mo>-</mo><mi>l</mi><mi>n</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mn>1</mn><mo>-</mo><mi>y</mi>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math>. This can then be used for obtaining random deviates from the given probability distribution <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>p</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>t</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math>. The following function can be used for getting the time for packet 30:</div>
+
+
+<div class='float-listings'><pre class ='listings'>def p30():
+	t=0
+	for i in range(30):	
+		t-=np.log(np.random.rand())
+	return t</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-37' />This experiment can be run 100 times, and the histogram for arrival of the 30th packet is as below:</div>
+
+<div class="standard"><a id='magicparlabel-38' /><img src='1C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_poisson_P30.png' alt='image: 1C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_poisson_P30.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-39' />This approximately follows a Bernoulli distribution, as expected for a Poisson process. Increasing the number of trials beyond 100 gives a more accurate representation of the phenomenon.</div>
+<h3 class="subsection"><a id='magicparlabel-40' /><span class="subsection_label">1.3</span> Interesting Function</h3>
+<div class="standard"><a id='magicparlabel-41' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>f</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mi>x</mi><mo>,</mo><mi>y</mi>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <msup>
+    <mrow><mi>u</mi>
+    </mrow>
+    <mrow><mn>2</mn>
+    </mrow>
+   </msup><mo>+</mo>
+   <msup>
+    <mrow><mi>v</mi>
+    </mrow>
+    <mrow><mn>2</mn>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-42' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mo form='prefix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>(</mo>
+   <mtable>
+    <mtr>
+     <mtd><mi>u</mi>
+     </mtd>
+    </mtr>
+    <mtr>
+     <mtd><mi>v</mi>
+     </mtd>
+    </mtr>
+   </mtable><mo form='postfix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>)</mo><mo>=</mo><mo form='prefix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>(</mo>
+   <mtable>
+    <mtr>
+     <mtd>
+      <mrow><mi>c</mi><mi>o</mi><mi>s</mi><mi> &alpha; </mi>
+      </mrow>
+     </mtd>
+     <mtd>
+      <mrow><mi>s</mi><mi>i</mi><mi>n</mi><mi> &alpha; </mi>
+      </mrow>
+     </mtd>
+    </mtr>
+    <mtr>
+     <mtd>
+      <mrow><mo>-</mo><mi>s</mi><mi>i</mi><mi>n</mi><mi> &alpha; </mi>
+      </mrow>
+     </mtd>
+     <mtd>
+      <mrow><mi>c</mi><mi>o</mi><mi>s</mi><mi> &alpha; </mi>
+      </mrow>
+     </mtd>
+    </mtr>
+   </mtable><mo form='postfix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>)</mo><mo form='prefix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>(</mo>
+   <mtable>
+    <mtr>
+     <mtd><mi>x</mi>
+     </mtd>
+    </mtr>
+    <mtr>
+     <mtd><mi>y</mi>
+     </mtd>
+    </mtr>
+   </mtable><mo form='postfix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>)</mo><mo>-</mo><mo form='prefix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>(</mo>
+   <mtable>
+    <mtr>
+     <mtd><mn>0.5</mn>
+     </mtd>
+    </mtr>
+    <mtr>
+     <mtd><mn>0.5</mn>
+     </mtd>
+    </mtr>
+   </mtable><mo form='postfix' fence='true' stretchy='true' symmetric='true' lspace='thinmathspace'>)</mo>
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-43' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi> &alpha; </mi><mo>=</mo><mi> &pi; </mi><mi>s</mi><mi>i</mi><mi>n</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mn>10</mn><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+    <mrow>
+     <msqrt>
+      <mrow>
+       <msup>
+        <mrow><mi>x</mi>
+        </mrow>
+        <mrow><mn>2</mn>
+        </mrow>
+       </msup><mo>+</mo>
+       <msup>
+        <mrow><mi>y</mi>
+        </mrow>
+        <mrow><mn>2</mn>
+        </mrow>
+       </msup>
+      </mrow>
+     </msqrt><mo>-</mo><mn>0.5</mn>
+    </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math></div>
+<h4 class="subsubsection"><a id='magicparlabel-44' /><span class="subsubsection_label">1.3.1</span> Implement the function in Python</h4>
+
+<div class='float-listings'><pre class ='listings'>def u(x,y):
+     ...:     alpha=np.pi*np.sin(10*(sqrt(x**2+y**2)-0.5))
+     ...:     u=x*cos(alpha)+y*sin(alpha)-0.5
+     ...:     return u
+
+def v(x,y):
+     ...:     alpha=np.pi*np.sin(10*(sqrt(x**2+y**2)-0.5))
+     ...:     v=-x*sin(alpha)+y*cos(alpha)-0.5
+     ...:     return v
+
+def f(x,y):
+     ...:     return u(x,y)**2+v(x,y)**2</pre></div>
+
+<h4 class="subsubsection"><a id='magicparlabel-61' /><span class="subsubsection_label">1.3.2</span> Contour Plot and Surface Plot of the function</h4>
+<div class="standard"><a id='magicparlabel-62' />The function contour plot over the xlimits of (-2,2) and ylimits of (-2,2) is as follows:</div>
+
+<div class="standard"><a id='magicparlabel-63' /><img src='2C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_contour_plot.png' alt='image: 2C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_contour_plot.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-64' />The surface plot looks as follows:</div>
+
+<div class="standard"><a id='magicparlabel-65' /><img src='3C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_3dSurfacePlot.png' alt='image: 3C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_3dSurfacePlot.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-66' />Finally, the region of interest (|f|&lt;1) is marked below (lies within the -2&lt;x,y&lt;2 rectangle):</div>
+
+<div class="standard"><a id='magicparlabel-67' /><img src='4C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_RoI_contour.png' alt='image: 4C__Users_rohan_Documents_GitHub_EE5011_ComputerMethodsEE_week7_ProbabilityDistbn_RoI_contour.png' />
+</div>
+<h4 class="subsubsection"><a id='magicparlabel-68' /><span class="subsubsection_label">1.3.3</span> Monte Carlo Integration</h4>
+<div class="standard"><a id='magicparlabel-69' />By using sampling-based integration for obtaining the area of the region of interest, we can use the upper bound function |Z|=1 and the limits <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mo>-</mo><mn>2</mn><mo>&lt;</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>&lt;</mo><mn>2</mn>
+  </mrow>
+ </mrow></math>. The points x,y are chosen uniformly on their intervals, and then the value of f(x,y) is computed. If the value is below 1, it is considered to be inside the region of interest. The total area under consideration is -2&lt;x,y&lt;2, or a total area of 16 units. This is multiplied to obtain the area within the region of interest as 3.142 units.</div>
+
+
+<div class='float-listings'><pre class ='listings'>countin = 0
+countout = 0
+
+for i in range(1000000):
+    ...:     a,b=np.random.rand(2)*4-2
+    ...:     c=f(a,b)
+    ...:     if abs(c)&lt;1:
+    ...:         countin+=1
+    ...:     else:
+    ...:         countout+=1
+
+In [78]: countin/float(countin+countout)
+Out[78]: 0.196376
+
+In [79]: 16*countin/float(countin+countout)
+Out[79]: 3.142016</pre></div>
+
+<h3 class="subsection"><a id='magicparlabel-90' /><span class="subsection_label">1.4</span> Poisson Point Process</h3>
+<div class="standard"><a id='magicparlabel-91' />A Poisson point process is a stochastic process wherein the number of arrivals per unit time is defined by the arrival rate <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi> &lambda; </mi>
+ </mrow></math>. The inter-arrival times are exponentially distributed with mean <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mn>1</mn><mo>/</mo><mi> &lambda; </mi>
+  </mrow>
+ </mrow></math>. The PDF is <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>f</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>t</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mi> &lambda; </mi><mo> exp </mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mo>-</mo><mi> &lambda; </mi><mi>t</mi>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math>, and the CDF is <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>F</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>t</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mn>1</mn><mo>-</mo><mo> exp </mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mo>-</mo><mi> &lambda; </mi><mi>t</mi>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math>. By using the inverse CDF method, we can obtain the required probability distribution by using: [SOURCE: https://stackoverflow.com/questions/1155539/how-do-i-generate-a-poisson-process]</div>
+
+<div class="standard"><a id='magicparlabel-92' /><math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mo>-</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mn>1</mn><mo>-</mo><mi>U</mi>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>/</mo><mi> &lambda; </mi><mo>=</mo><mo>-</mo><mi>l</mi><mi>o</mi><mi>g</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>U</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>/</mo><mi> &lambda; </mi>
+  </mrow>
+ </mrow></math>.</div>
+
+<div class="standard"><a id='magicparlabel-93' />Python provides a function to generate exponentially distributed random numbers using the above technique:</div>
+
+
+<div class='float-listings'><pre class ='listings'>import random
+for i in range(1,10):
+   print random.expovariate(15)</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-101' />The arrival times can be obtained by summing to a moving time variable:</div>
+
+
+<div class='float-listings'><pre class ='listings'>import random
+t= 0
+for i in range(1,10):
+   t+= random.expovariate(15)
+   print t</pre></div>
+
+</body>
+</html>

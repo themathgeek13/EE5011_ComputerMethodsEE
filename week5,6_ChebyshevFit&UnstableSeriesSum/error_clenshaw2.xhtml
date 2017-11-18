@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="GENERATOR" content="LyX 2.2.3" />
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<title>EE5011: Error Analysis and Clenshaw Algorithm</title>
+<style type='text/css'>
+/* Layout-provided Styles */
+h1.title {
+font-size: x-large;
+margin-bottom: 1ex;
+text-align: center;
+
+}
+div.author {
+font-size: large;
+margin-top: 1.3ex;
+margin-bottom: 0.7ex;
+text-align: center;
+
+}
+h2.section {
+font-weight: bold;
+font-size: x-large;
+margin-top: 1.3ex;
+margin-bottom: 0.7ex;
+text-align: left;
+
+}
+h3.subsection {
+font-weight: bold;
+font-size: large;
+margin-top: 0.9ex;
+margin-bottom: 0.5ex;
+text-align: left;
+
+}
+div.standard {
+margin-bottom: 2ex;
+}
+div.plain_layout {
+text-align: left;
+
+}
+div.float-listings {
+border: 2px solid black;
+padding: 1ex;
+margin: 1ex;
+}
+div.listings-caption {
+text-align: center;
+border: 2px solid black;
+padding: 1ex;
+margin: 1ex;
+}
+
+
+</style>
+</head>
+<body dir="auto">
+<h1 class="title"><a id='magicparlabel-1' />EE5011: Error Analysis and Clenshaw Algorithm</h1>
+<div class="author"><a id='magicparlabel-2' />Rohan Rao, EE14B118</div>
+<h2 class="section"><a id='magicparlabel-3' /><span class="section_label">1</span> Programming Assignment (Summing Series)</h2>
+<h3 class="subsection"><a id='magicparlabel-4' /><span class="subsection_label">1.1</span> Aitken's <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msup>
+    <mrow><mi> &delta; </mi>
+    </mrow>
+    <mrow><mn>2</mn>
+    </mrow>
+   </msup><mo>-</mo><mi>p</mi><mi>r</mi><mi>o</mi><mi>c</mi><mi>e</mi><mi>s</mi><mi>s</mi>
+  </mrow>
+ </mrow></math> </h3>
+<div class="standard"><a id='magicparlabel-5' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>I</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <msub>
+    <mrow><mi>J</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mi>j</mi><mi>x</mi>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <munderover>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>k</mi><mo>=</mo><mn>0</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi> &infin; </mi>
+    </mrow>
+   </munderover>
+   <mfrac>
+    <mrow>
+     <mrow><mo>(</mo><mo>-</mo><mn>1</mn>
+      <msup>
+       <mrow><mo>)</mo>
+       </mrow>
+       <mrow><mi>k</mi>
+       </mrow>
+      </msup><mo>(</mo><mi>j</mi><mi>x</mi><mo>/</mo><mn>2</mn>
+      <msup>
+       <mrow><mo>)</mo>
+       </mrow>
+       <mrow>
+        <mrow><mi>n</mi><mo>+</mo><mn>2</mn><mi>k</mi>
+        </mrow>
+       </mrow>
+      </msup>
+     </mrow>
+    </mrow>
+    <mrow>
+     <mrow><mi>k</mi><mo>!</mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+      <mrow><mi>n</mi><mo>+</mo><mi>k</mi>
+      </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>!</mo>
+     </mrow>
+    </mrow>
+   </mfrac><mo>=</mo>
+   <msup>
+    <mrow><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+     <mfrac>
+      <mrow>
+       <mrow><mi>j</mi><mi>x</mi>
+       </mrow>
+      </mrow>
+      <mrow><mn>2</mn>
+      </mrow>
+     </mfrac>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msup>
+   <munderover>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>k</mi><mo>=</mo><mn>0</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi> &infin; </mi>
+    </mrow>
+   </munderover>
+   <mfrac>
+    <mrow>
+     <mrow><mo>(</mo>
+      <msup>
+       <mrow><mi>x</mi>
+       </mrow>
+       <mrow><mn>2</mn>
+       </mrow>
+      </msup><mo>/</mo><mn>4</mn>
+      <msup>
+       <mrow><mo>)</mo>
+       </mrow>
+       <mrow><mi>k</mi>
+       </mrow>
+      </msup>
+     </mrow>
+    </mrow>
+    <mrow>
+     <mrow><mi>k</mi><mo>!</mo><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+      <mrow><mi>k</mi><mo>+</mo><mi>n</mi>
+      </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>!</mo>
+     </mrow>
+    </mrow>
+   </mfrac>
+  </mrow>
+ </mrow></math></div>
+
+
+<div class='float-listings'><pre class ='listings'>def kterm(x,k,n):      
+	...:     return (x**2/4.0)**k/(fact(k)*fact(k+n)) 
+
+def sumn(x,n):  
+     ...:     err=[]                 
+     ...:     s=kterm(x,0,n)*(1j*x/2)**n
+     ...:     for k in range(1,1000):
+     ...:         a=kterm(x,k,n)*(1j*x/2)**n         
+     ...:         err.append(a-kterm(x,k-1,n)*(1j*x/2)**n)
+     ...:         if abs(err[-1])&lt;1e-15:                               
+     ...:             break     
+     ...:         s+=a                              
+     ...:     return s,k+1,np.array(err)
+
+def calcAxn(x2,x1,x0):
+     ...:     return x2-((x2-x1)**2/((x2-x1)-(x1-x0)))
+
+def aitken(x,n): 
+     ...:     ax=[]; psum=[]; err=[]                 
+     ...:     psum.append(part(x,0,n)) 
+     ...:     for k in range(1,100): 
+     ...:         psum.append(psum[-1]+part(x,k,n))
+     ...:         if(len(psum)&gt;=3):                      
+     ...:             ax.append(calcAxn(psum[-1],psum[-2],psum[-3]))
+     ...:         if(len(ax)&gt;2):
+     ...:             err.append(abs(ax[-1]-ax[-2]))
+     ...:             if err[-1]&lt;1e-15: 
+     ...:                 break
+     ...:             
+     ...:     return np.array(err)</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-40' />Here, kterm defines the term after the summation symbol in the final formula on the RHS. This is used directly in the sumn function to evaluate the sum until the errror is below a tolerance (chosen at random) to be <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mn>1</mn>
+   <msup>
+    <mrow><mn>0</mn>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mn>15</mn>
+     </mrow>
+    </mrow>
+   </msup><mn>.</mn>
+  </mrow>
+ </mrow></math> The calcAxn function uses the Aitken <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msup>
+   <mrow><mi> &delta; </mi>
+   </mrow>
+   <mrow><mn>2</mn>
+   </mrow>
+  </msup>
+ </mrow></math> method by considering three partial sum terms at a time to obtain an accelerated convergence. The plot of the convergence of error of the above two methods is as shown below.</div>
+
+<div class="standard"><a id='magicparlabel-41' /><img src='0C__Users_rohan_Documents_GitHub_EE5011_Compute___5_6_ChebyshevFit_UnstableSeriesSum_figure_1.png' alt='image: 0C__Users_rohan_Documents_GitHub_EE5011_Compute___5_6_ChebyshevFit_UnstableSeriesSum_figure_1.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-42' />The curve on top is that of the direct summation, whereas the curve below it is the result of the Aitken method. This graph was evaluated for the value of x=6.1 and n=20. This gives a value of <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mn>3.092897418</mn><mo>*</mo><mn>1</mn>
+   <msup>
+    <mrow><mn>0</mn>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mn>9</mn>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math>. The value was compared with the one obtained from scipy.special.jn and is accurate.</div>
+<h2 class="section"><a id='magicparlabel-43' /><span class="section_label">2</span> Euler's transformation</h2>
+<div class="standard"><a id='magicparlabel-44' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msubsup>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>=</mo><mn>1</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi> &infin; </mi>
+    </mrow>
+   </msubsup><mo>(</mo><mo>-</mo><mn>1</mn>
+   <msup>
+    <mrow><mo>)</mo>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msup>
+   <mfrac>
+    <mrow>
+     <msup>
+      <mrow><mi>x</mi>
+      </mrow>
+      <mrow><mi>n</mi>
+      </mrow>
+     </msup>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </mfrac><mo>=</mo><mo>-</mo><mi>l</mi><mi>n</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <mrow><mn>1</mn><mo>+</mo><mi>x</mi>
+   </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-45' />Euler's transformation is intended to be applied to an alternating series, as follows:</div>
+
+<div class="standard"><a id='magicparlabel-46' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msubsup>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>=</mo><mn>0</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi> &infin; </mi>
+    </mrow>
+   </msubsup><mo>(</mo><mo>-</mo><mn>1</mn>
+   <msup>
+    <mrow><mo>)</mo>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msup>
+   <msub>
+    <mrow><mi>a</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo>=</mo>
+   <msubsup>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>=</mo><mn>0</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi> &infin; </mi>
+    </mrow>
+   </msubsup><mo>(</mo><mo>-</mo><mn>1</mn>
+   <msup>
+    <mrow><mo>)</mo>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msup>
+   <mfrac>
+    <mrow>
+     <mrow>
+      <msup>
+       <mrow><mi> varDelta </mi>
+       </mrow>
+       <mrow><mi>n</mi>
+       </mrow>
+      </msup>
+      <msub>
+       <mrow><mi>a</mi>
+       </mrow>
+       <mrow><mn>0</mn>
+       </mrow>
+      </msub>
+     </mrow>
+    </mrow>
+    <mrow>
+     <msup>
+      <mrow><mn>2</mn>
+      </mrow>
+      <mrow>
+       <mrow><mi>n</mi><mo>+</mo><mn>1</mn>
+       </mrow>
+      </mrow>
+     </msup>
+    </mrow>
+   </mfrac>
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-47' />where <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow><mi> varDelta </mi>
+ </mrow></math> is the forward difference operator:</div>
+
+<div class="standard"><a id='magicparlabel-48' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msup>
+    <mrow><mi> varDelta </mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msup>
+   <msub>
+    <mrow><mi>a</mi>
+    </mrow>
+    <mrow><mn>0</mn>
+    </mrow>
+   </msub><mo>=</mo>
+   <msubsup>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>k</mi><mo>=</mo><mn>0</mn>
+     </mrow>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msubsup><mo>(</mo><mo>-</mo><mn>1</mn>
+   <msup>
+    <mrow><mo>)</mo>
+    </mrow>
+    <mrow><mi>k</mi>
+    </mrow>
+   </msup><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+   <msubsup><mrow />
+    <mrow><mi>k</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msubsup>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+   <msub>
+    <mrow><mi>a</mi>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>-</mo><mi>k</mi>
+     </mrow>
+    </mrow>
+   </msub>
+  </mrow>
+ </mrow></math></div>
+
+
+<div class='float-listings'><pre class ='listings'>def xterm(x,n):       
+     ...:     return (-x)**n/n</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-55' />The above function returns the n-th term of the series to be summed.</div>
+
+
+<div class='float-listings'><pre class ='listings'> def neglnx(y):        
+     ...:     s=xterm(y,1);i=2
+     ...:     val=xterm(y,1)
+     ...:     while i&lt;1e10:
+     ...:         if abs(val-xterm(y,i))&lt;1e-15:
+     ...:             break
+     ...:         val=xterm(y,i)
+     ...:         s+=val
+     ...:         i+=1
+     ...:     return s,i</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-70' />This function directly sums the series upto a tolerance of <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mn>1</mn>
+   <msup>
+    <mrow><mn>0</mn>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mn>15</mn>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math>.</div>
+
+
+<div class='float-listings'><pre class ='listings'>def fwdiff(x,n):
+     ...:     s=0            
+     ...:     for k in range(n):
+     ...:        s+=(-1)**k*an(x,n-k)*scipy.misc.comb(n,k)/2**(n+1)
+     ...:     return s </pre></div>
+
+
+<div class="standard"><a id='magicparlabel-80' />This is the forward difference function as defined above, but modified to exclude k=n, since that would result in a divide-by-zero operation due to the nature of <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msub>
+   <mrow><mi>a</mi>
+   </mrow>
+   <mrow><mi>n</mi>
+   </mrow>
+  </msub>
+ </mrow></math>.</div>
+
+
+<div class='float-listings'><pre class ='listings'>def Euler(x):   
+     ...:     s=fwdiff(x,0)/2
+     ...:     val=s             
+     ...:     for i in range(1,100000):                            
+     ...:         val2=(-1)**i*fwdiff(x,i)
+     ...:         if(abs(val2-val)&lt;1e-15):
+     ...:             break
+     ...:         s+=val
+     ...:         val=val2
+     ...:     return s,i+1</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-95' />Finally, this function sums the Euler transformed series, as defined above, to a tolerance of <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mn>1</mn>
+   <msup>
+    <mrow><mn>0</mn>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mn>15</mn>
+     </mrow>
+    </mrow>
+   </msup>
+  </mrow>
+ </mrow></math>. The plots are as shown below:</div>
+
+<div class="standard"><a id='magicparlabel-96' /><img src='1C__Users_rohan_Documents_GitHub_EE5011_Compute___6_ChebyshevFit_UnstableSeriesSum_figure_2-1.png' alt='image: 1C__Users_rohan_Documents_GitHub_EE5011_Compute___6_ChebyshevFit_UnstableSeriesSum_figure_2-1.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-97' />It can be seen that the direct summing method dominates up until x=0.5, after which the Euler transformation is significantly better than the direct summation method.</div>
+
+<div class="standard"><a id='magicparlabel-98' /><img src='2C__Users_rohan_Documents_GitHub_EE5011_Compute___6_ChebyshevFit_UnstableSeriesSum_figure_2-2.png' alt='image: 2C__Users_rohan_Documents_GitHub_EE5011_Compute___6_ChebyshevFit_UnstableSeriesSum_figure_2-2.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-99' />For x&lt;0, it can be seen that the direct summation method is better than the Euler transformation method.</div>
+<h2 class="section"><a id='magicparlabel-100' /><span class="section_label">3</span> Quadratic Equation</h2>
+<h2 class="section"><a id='magicparlabel-101' /><span class="section_label">4</span> Stable and unstable series</h2>
+<div class="standard"><a id='magicparlabel-102' />The series to be summed is as follows:</div>
+
+<div class="standard"><a id='magicparlabel-103' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow><mi>S</mi><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <msubsup>
+    <mrow><mo> &sum; </mo>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>=</mo><mn>0</mn>
+     </mrow>
+    </mrow>
+    <mrow><mn>40</mn>
+    </mrow>
+   </msubsup>
+   <mfrac>
+    <mrow><mn>1</mn>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>+</mo><mn>1</mn>
+     </mrow>
+    </mrow>
+   </mfrac>
+   <msub>
+    <mrow><mi>J</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-104' />The function <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>J</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math> is the <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <msup>
+   <mrow><mi>n</mi>
+   </mrow>
+   <mrow>
+    <mrow><mi>t</mi><mi>h</mi>
+    </mrow>
+   </mrow>
+  </msup>
+ </mrow></math> term of the Bessel series.</div>
+
+<div class="standard"><a id='magicparlabel-105' />A Python function to compute the sum (exact solution) is as follows:</div>
+
+
+<div class='float-listings'><pre class ='listings'>from scipy.special import jn
+
+def S(x,num):
+	total=0
+	for i in range(num+1):
+		total+=jn(i,x)/(i+1)
+	return total</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-117' />This gives the exact value of S(1.5,40) = 0.88608893929096932 and S(15,40) = 0.12377300077343459.</div>
+
+<div class="standard"><a id='magicparlabel-118' />The recursion formula for the Bessel-like functions is as follows:</div>
+
+<div class="standard"><a id='magicparlabel-119' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <mfrac>
+    <mrow>
+     <mrow><mn>2</mn><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+      <mrow><mi>n</mi><mo>-</mo><mn>1</mn>
+      </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+     </mrow>
+    </mrow>
+    <mrow><mi>x</mi>
+    </mrow>
+   </mfrac>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>-</mo><mn>1</mn>
+     </mrow>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>-</mo>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>-</mo><mn>2</mn>
+     </mrow>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math></div>
+
+<div class="standard"><a id='magicparlabel-120' />where <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math> is either <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>J</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math> or <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>Y</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math> or a linear combination of the two.</div>
+
+<div class="standard"><a id='magicparlabel-121' />For computing the series using a forward recursion, we can use the initial condition of <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>J</mi>
+    </mrow>
+    <mrow>
+     <mrow><mo>-</mo><mn>1</mn>
+     </mrow>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo><mn>0</mn>
+  </mrow>
+ </mrow></math> and <math xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>J</mi>
+    </mrow>
+    <mrow><mn>0</mn>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math> obtained from scipy.special.jn. Then we can use these in a loop with dynamic programming to obtain the two sequences for x=1.5 and x=15.</div>
+
+
+<div class='float-listings'><pre class ='listings'>vals1p5=[0,jn(0,1.5)]
+for i in range(50):
+	vals1p5.append(vals1p5[-1]*2*i/1.5-vals1p5[-2])
+del vals1p5[0]
+vals15=[0,jn(0,15)]
+for i in range(50):
+	vals15.append(vals15[-1]*2*i/15-vals15[-2])
+del vals15[0]</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-134' />The above two sequences obtained from forward recursion can be used to calculate the sum of the above series, with the error being checked at every stage.</div>
+
+
+<div class='float-listings'><pre class ='listings'>n=np.array(range(41))
+fwd15=abs(np.cumsum(vals15/(n+1)))
+fwd1p5=abs(np.cumsum(vals1p5/(n+1)))
+err1p5=s1(1.5,n)-fwd1p5[:41]
+err15=s1(15,n)-fwd15[:41]</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-144' />The plots obtained are as follows:</div>
+
+<div class="standard"><a id='magicparlabel-145' /><img src='3C__Users_rohan_Documents_GitHub_EE5011_Compute___k5_6_ChebyshevFit_UnstableSeriesSum_xval1p5.png' alt='image: 3C__Users_rohan_Documents_GitHub_EE5011_Compute___k5_6_ChebyshevFit_UnstableSeriesSum_xval1p5.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-146' />Error grows exponentially (semilog scale) for n ~ 3.</div>
+
+<div class="standard"><a id='magicparlabel-147' /><img src='4C__Users_rohan_Documents_GitHub_EE5011_Compute___ek5_6_ChebyshevFit_UnstableSeriesSum_xval15.png' alt='image: 4C__Users_rohan_Documents_GitHub_EE5011_Compute___ek5_6_ChebyshevFit_UnstableSeriesSum_xval15.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-148' />Error grows exponentially beyond n ~ 18.</div>
+
+<div class="standard"><a id='magicparlabel-149' />This shows that the series is unstable for forward recursion when n &gt; x. The different values of x=1.5 and x=15 show the variation in the error plot as above.</div>
+
+<div class="standard"><a id='magicparlabel-150' />Using the following recursion for reversed calculation:</div>
+
+<div class="standard"><a id='magicparlabel-151' /><math display="block" xmlns="http://www.w3.org/1998/Math/MathML">
+ <mrow>
+  <mrow>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow><mi>n</mi>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>=</mo>
+   <mfrac>
+    <mrow>
+     <mrow><mn>2</mn><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+
+      <mrow><mi>n</mi><mo>+</mo><mn>1</mn>
+      </mrow>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+     </mrow>
+    </mrow>
+    <mrow><mi>x</mi>
+    </mrow>
+   </mfrac>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>+</mo><mn>1</mn>
+     </mrow>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+<mo>-</mo>
+   <msub>
+    <mrow><mi>Z</mi>
+    </mrow>
+    <mrow>
+     <mrow><mi>n</mi><mo>+</mo><mn>2</mn>
+     </mrow>
+    </mrow>
+   </msub><mo form='prefix' fence='true' stretchy='true' symmetric='true'>(</mo>
+<mi>x</mi>
+<mo form='postfix' fence='true' stretchy='true' symmetric='true'>)</mo>
+
+  </mrow>
+ </mrow></math></div>
+
+
+<div class='float-listings'><pre class ='listings'>vals1p5=[0,1] #J61, J60
+for i in range(60):
+	vals1p5.append(2*(60-i)*vals1p5[-1]/1.5-vals1p5[-2])
+
+vals15=[0,1]
+for i in range(60):
+	vals15.append(2*(60-i)*vals15[-1]/15.0-vals15[-2])
+
+#NORMALIZE
+vals15=np.array(vals15)
+vals15/=vals15[-1]
+vals1p5=np.array(vals1p5)
+vals1p5/=vals1p5[-1]
+
+#Reverse
+vals1p5=vals1p5[::-1][:41]
+vals15=vals15[::-1][:41]
+
+n=np.array(range(41))
+fwd15=abs(np.cumsum(vals15/(n+1)))
+fwd1p5=abs(np.cumsum(vals1p5/(n+1)))
+err1p5=s1(1.5,n)-fwd1p5[:41]
+err15=s1(15,n)-fwd15[:41]</pre></div>
+
+
+<div class="standard"><a id='magicparlabel-179' />The plots obtained are as follows:</div>
+
+<div class="standard"><a id='magicparlabel-180' /><img src='5C__Users_rohan_Documents_GitHub_EE5011_Compute___6_ChebyshevFit_UnstableSeriesSum_err1p5_rev.png' alt='image: 5C__Users_rohan_Documents_GitHub_EE5011_Compute___6_ChebyshevFit_UnstableSeriesSum_err1p5_rev.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-181' /><img src='6C__Users_rohan_Documents_GitHub_EE5011_Compute____6_ChebyshevFit_UnstableSeriesSum_err15_rev.png' alt='image: 6C__Users_rohan_Documents_GitHub_EE5011_Compute____6_ChebyshevFit_UnstableSeriesSum_err15_rev.png' />
+</div>
+
+<div class="standard"><a id='magicparlabel-182' />This shows that using the reverse recursion for obtaining the series sum can significantly reduce the error, and keep the series stable.</div>
+</body>
+</html>
