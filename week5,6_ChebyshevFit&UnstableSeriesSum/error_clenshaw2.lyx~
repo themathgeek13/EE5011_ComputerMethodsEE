@@ -994,7 +994,17 @@ The plots obtained are as follows:
 \end_layout
 
 \begin_layout Standard
+\begin_inset Graphics
+	filename err15_rev.png
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This shows that using the reverse recursion for obtaining the series sum
+ can significantly reduce the error, and keep the series stable.
 \end_layout
 
 \end_body
