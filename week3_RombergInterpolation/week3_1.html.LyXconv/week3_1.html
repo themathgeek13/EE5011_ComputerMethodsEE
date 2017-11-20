@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <meta name="generator" content="http://www.nongnu.org/elyxer/"/>
-<meta name="create-date" content="2017-08-27"/>
+<meta name="create-date" content="2017-11-20"/>
 <link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
 <title>Romberg Integration (Week 4)</title>
 </head>
@@ -83,6 +83,13 @@ On a semi log scale in y = f(u) on the range [0.001,10] is as follows:
 </div>
 <div class="Indented">
 The above plot shows that beyond x=2 (approx), the function behaves like an exponentially decaying function, and by the time x=10, the value has dropped by 10 orders of magnitude.
+</div>
+<div class="Indented">
+Finally, on a log-log scale:
+</div>
+<div class="Indented">
+<img class="embedded" src="loglog_fnplot.png" alt="figure loglog_fnplot.png" style="max-width: 640px; max-height: 480px;"/>
+
 </div>
 <div class="Indented">
 Code:
@@ -266,7 +273,7 @@ Out2:
 The plot obtained (log-log plot due to large order variations):
 </div>
 <div class="Indented">
-<img class="embedded" src="errorVScalls.png" alt="figure errorVScalls.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="errorVScalls.png" alt="figure errorVScalls.png" style="max-width: 640px; max-height: 480px;"/>
 
 </div>
 <div class="Indented">
@@ -309,7 +316,7 @@ Out:
 
 </div>
 <div class="Indented">
-<img class="embedded" src="qromb_errvscalls.png" alt="figure qromb_errvscalls.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="qromb_errvscalls.png" alt="figure qromb_errvscalls.png" style="max-width: 640px; max-height: 480px;"/>
 
 </div>
 <div class="Indented">
@@ -343,14 +350,14 @@ ylabel("Error in integration")
 
 </div>
 <div class="Indented">
-<img class="embedded" src="qromb_errvscalls_split.png" alt="figure qromb_errvscalls_split.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="qromb_errvscalls_split.png" alt="figure qromb_errvscalls_split.png" style="max-width: 640px; max-height: 480px;"/>
 
 </div>
 <div class="Indented">
 The plot above has a much steeper slope as compared to the naive Romberg integration being applied on the full interval (0,20). This is a result of correctly using the information of the sharp peak at x=1 for splitting the integral to obtain a more precise numerical solution. The comparison on the same plot is given below:
 </div>
 <div class="Indented">
-<img class="embedded" src="comparison.png" alt="figure comparison.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="comparison.png" alt="figure comparison.png" style="max-width: 640px; max-height: 480px;"/>
 
 </div>
 <h2 class="Subsection">
@@ -392,7 +399,7 @@ y,err=r.polint(xx,yy,0)	//extrapolation to h=0
 <a class="toc" name="toc-Subsection-1.9">1.9</a> Varying order of qromb vs number of function calls
 </h2>
 <div class="Unindented">
-<img class="embedded" src="rombergCalls.png" alt="figure rombergCalls.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="rombergCalls.png" alt="figure rombergCalls.png" style="max-width: 640px; max-height: 480px;"/>
 
 </div>
 <div class="Indented">
@@ -402,7 +409,7 @@ As can be seen from the semilog plot above, the number of calls decreases from n
 <a class="toc" name="toc-Subsection-1.10">1.10</a> Spline Integration using B-Spline from scipy
 </h2>
 <div class="Unindented">
-<img class="embedded" src="splineErr.png" alt="figure splineErr.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="splineErr.png" alt="figure splineErr.png" style="max-width: 640px; max-height: 480px;"/>
 <br/>
 This plot shows that the error drops by an order of magnitude (log-log plot) with an order of magnitude increase in number of function calls. Spline interpolation of the function forces it to consider the kink at x=1 as an n-th order smooth polynomial, thus reducing the accuracy of the fit. As more points are included, the value around x=1 is sampled even more closely, thus improving the accuracy, but not actually addressing the problem, that is the kink at x=1.
 </div>
@@ -463,14 +470,14 @@ Out:
 The above code snippet splits the function into two parts, one before 1 and one after 1. The number of points for a given evaluation remains the same as before (half the points are used before 1, and half are used after 1: this could have been made as 1/20 before 1 and 19/20 after 1 as well).
 </div>
 <div class="Indented">
-<img class="embedded" src="splineErr_withSplit.png" alt="figure splineErr_withSplit.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="splineErr_withSplit.png" alt="figure splineErr_withSplit.png" style="max-width: 640px; max-height: 480px;"/>
 
 </div>
 <div class="Indented">
 The above graph decays much faster than the previously obtained graph. This can be seen from the image below.
 </div>
 <div class="Indented">
-<img class="embedded" src="comparison_splint.png" alt="figure comparison_splint.png" style="max-width: 812px; max-height: 612px;"/>
+<img class="embedded" src="comparison_splint.png" alt="figure comparison_splint.png" style="max-width: 640px; max-height: 480px;"/>
 
 </div>
 <div class="Indented">
@@ -520,10 +527,6 @@ y,err=r.polint(xx,yy,0)
 Use of the above code snippet gives an error y-exact() as <span class="formula">3.4766<i>x</i>10<sup> − 10</sup></span>, and requires N=265741 calls to the function &ldquo;integrand&rdquo;. From section 1.6, it is seen that the qromb function in the romberg module requires 524289 function calls for a similar order tolerance. This is about 2 times more than that required for the 3-point Romberg as programmed above, which does not even consider logic for utilizing previously used points.
 </div>
 
-<hr class="footer"/>
-<div class="footer" id="generated-by">
-Document generated by <a href="http://elyxer.nongnu.org/">eLyXer 1.2.5 (2013-03-10)</a> on <span class="create-date">2017-08-27T18:14:57.612877</span>
-</div>
 </div>
 </body>
 </html>
