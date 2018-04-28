@@ -1,9 +1,9 @@
 from scipy import *
 from matplotlib.pyplot import *
-import weave
+from scipy import weave
 
 #define support code
-with open("spline.c","r") as f:
+with open("spline_orig.c","r") as f:
 	scode=f.read()
 	
 h=logspace(-3,0,16)

@@ -1007,5 +1007,477 @@ This shows that using the reverse recursion for obtaining the series sum
  can significantly reduce the error, and keep the series stable.
 \end_layout
 
+\begin_layout Subsection
+Clenshaw Algorithm
+\end_layout
+
+\begin_layout Standard
+The Clenshaw algorithm implemented in Python, is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#Clenshaw Algorithm:
+\end_layout
+
+\begin_layout Plain Layout
+
+#S(x)=sum(0 to n, c_k*F_k(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+#F_(n+1)(x)=alpha(n,x)*F_n(x)+beta(n,x)*F_(n-1)(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+import numpy as np
+\end_layout
+
+\begin_layout Plain Layout
+
+import scipy.special
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def alpha(i,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+    #return x/(2*(i+1))
+\end_layout
+
+\begin_layout Plain Layout
+
+    return 2*x
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def beta(i,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+    #return x**2/(2*(i+1)*i)
+\end_layout
+
+\begin_layout Plain Layout
+
+    return -1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def F(i,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+    if(i==0):
+\end_layout
+
+\begin_layout Plain Layout
+
+        return 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    if(i==1):
+\end_layout
+
+\begin_layout Plain Layout
+
+        return x
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def a(i):
+\end_layout
+
+\begin_layout Plain Layout
+
+    return coeff[i]
+\end_layout
+
+\begin_layout Plain Layout
+
+    #return 1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def S(F,alpha,beta,a,x,n):
+\end_layout
+
+\begin_layout Plain Layout
+
+    b=np.zeros(n+3)
+\end_layout
+
+\begin_layout Plain Layout
+
+    b[-1]=b[-2]=0
+\end_layout
+
+\begin_layout Plain Layout
+
+    for i in range(n,0,-1):
+\end_layout
+
+\begin_layout Plain Layout
+
+        b[i]=a(i)+alpha(i,x)*b[i+1]+beta(i+1,x)*b[i+2]
+\end_layout
+
+\begin_layout Plain Layout
+
+    return F(0,x)*a(0)+F(1,x)*b[1]+beta(1,x)*F(0,x)*b[2]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the Chebyshev sum for 
+\begin_inset Formula $e^{x}$
+\end_inset
+
+ requires the Chebyshev coefficients, which can be calculated using the
+ procedure below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def chebfit(xdata,ydata,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     n=len(xdata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     xmax=max(xdata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     xmin=min(xdata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     xdata=(2*xdata-xmax-xmin)/(xmax-xmin)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     T=np.zeros((n,n))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     T[:,0]=1
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     T[:,1]=xdata
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     for j in range(2,n):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         T[:,j]=2*xdata*T[:,j-1]-T[:,j-2]
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     b=np.dot(np.linalg.inv(T),ydata)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     x=(2*x-xmax-xmin)/(xmax-xmin)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     y=np.zeros(len(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     for j in range(n):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         y=y+b[j]*cos((j-1)*arccos(x));
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return y,b
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This can also be computed using the np.polynomial.chebyshev.chebfit function
+ in Numpy.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+coeff=np.polynomial.chebyshev.chebfit(x,y,20)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The coefficients can then be used to obtain the function by using the Chebyshev
+ recursive formula:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def chebpoly(n,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     if(n==0):         
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         return 1      
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     if(n==1):         
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         return x
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return 2*x*chebpoly(n-1,x)-chebpoly(n-2,x)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def chebapproxfn(coeff,x):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     n=len(coeff)      
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     s=0               
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     for i in range(n):
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:         s+=coeff[i]*chebpoly(i,x)
+\end_layout
+
+\begin_layout Plain Layout
+
+     ...:     return s
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The error obtained using this direct method is of the order of 
+\begin_inset Formula $10^{-14}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename epowx.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Upon using the Clenshaw algorithm, the following plot is obtained.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename clenshaw.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The spaces are where the error is zero, so log(error) is not defined.
+\end_layout
+
+\begin_layout Standard
+This shows that the Clenshaw algorithm gives an error that is better than
+ the direct sum obtained from above.
+\end_layout
+
+\begin_layout Standard
+The mean and standard deviation of the plots above is as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+Direct Sum:
+\end_layout
+
+\begin_layout Plain Layout
+
+mean = 3.835e-15
+\end_layout
+
+\begin_layout Plain Layout
+
+std = 1.044e-14
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+Clenshaw Sum:
+\end_layout
+
+\begin_layout Plain Layout
+
+mean = 1.141e-15
+\end_layout
+
+\begin_layout Plain Layout
+
+std = 8.393e-16
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Clearly, the Clenshaw sum has a 3 times lower mean and an order of magnitude
+ better standard deviation.
+ In the case of the series S(x), it doesn't matter for the Clenshaw algorithm
+ whether it is stable in forward or backward direction.
+ So I will use the forward series to ensure it works.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Z_{n+1}(x)=\frac{2n}{x}Z_{n}(x)-Z_{n-1}(x)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+When I tried the same Clenshaw algorithm for this series, it was giving
+ the wrong answer, and I think something is wrong.
+\end_layout
+
 \end_body
 \end_document

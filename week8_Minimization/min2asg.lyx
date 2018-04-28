@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -49,6 +51,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -57,7 +60,10 @@
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -783,7 +789,7 @@ status open
 
 \begin_layout Plain Layout
 
-pos=np.array([0,0,0])
+pos=np.array([0,0,0],dtype=np.float64)
 \end_layout
 
 \begin_layout Plain Layout
@@ -803,11 +809,12 @@ deltaz=np.array([0,0,1e-4])
 
 \begin_layout Plain Layout
 
+dirs=[deltax,deltay,deltaz]
 \end_layout
 
 \begin_layout Plain Layout
 
-for i in range(1000):      
+for i in range(1):      
 \end_layout
 
 \begin_layout Plain Layout
@@ -817,92 +824,92 @@ for i in range(1000):
 
 \begin_layout Plain Layout
 
-     ...:     if f(pos)>f(pos+deltax):
+     ...:     if f(pos)>f(pos+dirs[0]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:         while f(pos)>f(pos+deltax):
+     ...:         while f(pos)>f(pos+dirs[0]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:             pos=pos+deltax
+     ...:             pos=pos+dirs[0]
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:     elif(f(pos)>f(pos-deltax)):
+     ...:     elif(f(pos)>f(pos-dirs[0])):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:         while f(pos)>f(pos-deltax):
+     ...:         while f(pos)>f(pos-dirs[0]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:             pos=pos-deltax
+     ...:             pos=pos-dirs[0]
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:     if f(pos)>f(pos+deltay):
+     ...:     if f(pos)>f(pos+dirs[1]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:         while f(pos)>f(pos+deltay):
+     ...:         while f(pos)>f(pos+dirs[1]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:             pos=pos+deltay
+     ...:             pos=pos+dirs[1]
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:     elif f(pos)>f(pos-deltay):
+     ...:     elif f(pos)>f(pos-dirs[1]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:         while f(pos)>f(pos-deltay):
+     ...:         while f(pos)>f(pos-dirs[1]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:             pos=pos-deltay
+     ...:             pos=pos-dirs[1]
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:     if f(pos)>f(pos+deltaz):
+     ...:     if f(pos)>f(pos+dirs[2]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:         while f(pos)>f(pos+deltaz):
+     ...:         while f(pos)>f(pos+dirs[2]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:             pos=pos+deltaz
+     ...:             pos=pos+dirs[2]
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:     elif f(pos)>f(pos-deltaz):
+     ...:     elif f(pos)>f(pos-dirs[2]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:         while f(pos)>f(pos-deltaz):
+     ...:         while f(pos)>f(pos-dirs[2]):
 \end_layout
 
 \begin_layout Plain Layout
 
-     ...:             pos=pos-deltaz
+     ...:             pos=pos-dirs[2]
 \end_layout
 
 \begin_layout Plain Layout
@@ -960,9 +967,264 @@ OUTPUT:
 \end_layout
 
 \begin_layout Standard
-Thus, just 5 iterations are required for converging to the minimum in this
- case.
- This may converge to a different minima depending on the starting point.
+Thus, just 5 
+\begin_inset Quotes eld
+\end_inset
+
+iterations
+\begin_inset Quotes erd
+\end_inset
+
+ are required for converging to the minimum in this case.
+ These iterations have while loops inside them where the number of updates
+ may be far higher than is visible from the above output.
+ This may also converge to a different minima depending on the starting
+ point.
+\end_layout
+
+\begin_layout Subsection
+Minimizing using gradient descent
+\begin_inset Formula 
+\[
+f(x,y,z)=1.5-J_{0}\left((x-0.5)^{2}+(0.5x+y-0.5)^{2}+(0.25x+0.5y+z-0.5)^{2}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The function partial derivatives can be evaluated by considering that 
+\begin_inset Formula $\frac{\partial J_{0}(z)}{\partial z}=-J_{1}(z)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial f}{\partial x}=J_{1}((x-0.5)^{2}+(0.5x+y-0.5)^{2}+(0.25x+0.5y+z-0.5)^{2})*(2(x-0.5)+(0.5x+y-0.5)+0.5(0.25x+0.5y+z-0.5))
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial f}{\partial y}=J_{1}((x-0.5)^{2}+(0.5x+y-0.5)^{2}+(0.25x+0.5y+z-0.5)^{2})*(2(0.5x+y-0.5)+(0.25x+0.5y+z-0.5))
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{\partial f}{\partial z}=J_{1}((x-0.5)^{2}+(0.5x+y-0.5)^{2}+(0.25x+0.5y+z-0.5)^{2})*(2(0.25x+0.5y+z-0.5))
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The code below can be used to evaluate the derivatives and perform the gradient
+ descent.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+def fdx(x):          
+\end_layout
+
+\begin_layout Plain Layout
+
+	val=(x[0]-0.5)**2+(0.5*x[0]+x[1]-0.5)**2+(0.25*x[0]+0.5*x[1]+x[2]-0.5)**2   
+                   return jn(1,val)*(2*(x[0]-0.5)+(0.5*x[0]+x[1]-0.5)+0.5*(0.25*x[0]+
+0.5*x[1]+x[2]-0.5)) 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def fdy(x):          
+\end_layout
+
+\begin_layout Plain Layout
+
+    val=(x[0]-0.5)**2+(0.5*x[0]+x[1]-0.5)**2+(0.25*x[0]+0.5*x[1]+x[2]-0.5)**2
+                                         
+\end_layout
+
+\begin_layout Plain Layout
+
+    return jn(1,val)*((x[0]+2*x[1]-1)+0.25*x[0]+0.5*x[1]+x[2]-0.5) 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+def fdz(x):          
+\end_layout
+
+\begin_layout Plain Layout
+
+    val=(x[0]-0.5)**2+(0.5*x[0]+x[1]-0.5)**2+(0.25*x[0]+0.5*x[1]+x[2]-0.5)**2
+                                         
+\end_layout
+
+\begin_layout Plain Layout
+
+    return jn(1,val)*(0.5*x[0]+x[1]+2*x[2]-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+learning_rate=3
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+for i in range(1000):
+\end_layout
+
+\begin_layout Plain Layout
+
+    prev=f(pos)                                                        
+\end_layout
+
+\begin_layout Plain Layout
+
+    delx=fdx(pos); dely=fdy(pos); delz=fdz(pos)
+\end_layout
+
+\begin_layout Plain Layout
+
+	pos[0]-=learning_rate*delx; pos[1]-=learning_rate*dely; pos[2]-=learning_rate*d
+elz
+\end_layout
+
+\begin_layout Plain Layout
+
+	print pos, f(pos),i+1
+\end_layout
+
+\begin_layout Plain Layout
+
+	if abs(prev-f(pos))<1e-10:
+\end_layout
+
+\begin_layout Plain Layout
+
+		break
+\end_layout
+
+\begin_layout Plain Layout
+
+	else:
+\end_layout
+
+\begin_layout Plain Layout
+
+		print abs(prev-f(pos))
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Experimenting with the learning rate, a value of 3 seems to allow it to
+ converge to below 10^-10 error in around 300 iterations.
+\end_layout
+
+\begin_layout Subsection
+Conjugate Gradient Descent
+\end_layout
+
+\begin_layout Standard
+In conjugate gradient descent, the function is minimized by choosing a set
+ of conjugate directions, which are defined using a condition involving
+ the Hessian matrix, and ensures that the updates along each direction are
+ not undone by the next set of updates.
+ To find the Hessian matrix A, I have used SymPy, a symbolic computation
+ library for Python that allows us to evaluate everything symbolically and
+ calculate the expression value in the end.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import sympy as S
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+x,y,z=S.symbols('x y z')
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+f1 = (x-0.5)**2+(0.5*x+y-0.5)**2+(0.25*x+0.5*y+z-0.5)**2
+\end_layout
+
+\begin_layout Plain Layout
+
+f = 1.5 - S.besselj(0,f1)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+H = S.hessian(f,[x,y,z])
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1329,14 +1591,6 @@ array([-4.48908229, 5.45022692]), 0.00010828963033755263
 
 \begin_layout Subsection
 Conjugate Gradient method
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \end_body

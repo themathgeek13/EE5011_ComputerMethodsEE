@@ -887,6 +887,22 @@ status open
 Clearly, the errors have increased by nearly an order of 8.
  This shows that the magnitude of the derivative at the boundaries plays
  an important role in obtaining the spline fit coefficients.
+ The points near the edge have the maximum error, as can be seen from the
+ plot below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename 100xder.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The function is of the form of a FIR filter with zeros at the points where
+ the value is known, since the spline fit needs to pass through those points.
 \end_layout
 
 \end_body

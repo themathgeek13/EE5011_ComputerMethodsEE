@@ -39,7 +39,7 @@ import sing_intg as si
 #q1. transform to -1 to 1.
 # Let t = x-2
 def f(t):
-    return np.exp(-t-2)*np.sqrt(1-t*t)/jv(1,sqrt(1-t**2))
+    return np.exp(-t-2)#*np.sqrt(1-t*t)/jv(1,sqrt(1-t**2))
 
 #https://en.wikipedia.org/wiki/Chebyshev%E2%80%93Gauss_quadrature
 #integral from -1 to 1 f(x)dx/sqrt(1-x^2)
@@ -50,7 +50,7 @@ def calcGQ(x,w):
         sum+=f(x[i])*w[i]
     return sum
 
-x=np.array(range(20))
+x=np.array(range(1,21))
 x=cos(np.pi*(x-0.5)/20)
 print x
 w=np.full(20,np.pi/20)
@@ -60,16 +60,17 @@ print exactVal
 intvals=[]; errors=[]
 
 for i in range(1,20):
-    x=np.array(range(i))
+    x=np.array(range(1,i+1))
     x=cos(np.pi*(x-0.5)/i)
     w=np.full(i,np.pi/i)
     intVal=calcGQ(x,w)
     print intVal, intVal-exactVal
     intvals.append(intVal)
     errors.append(abs(intVal-exactVal))
+    print errors[-1]
 
-plot(range(1,20),errors,'ro')
-plot(range(1,20),errors)
+semilogy(xrange(1,20),errors,'ro')
+semilogy(xrange(1,20),errors)
 title("Error v/s N for the Gauss-Chebyshev Quadratures")
 xlabel("Number of points (N)")
 ylabel("Error considering N=20 is exact")
@@ -101,17 +102,18 @@ total=0.0
 for i in range(len(x)):
     total+=f1(x[i])*w[i]
 print "Gauss-Legendre: ", total, total-int1[0]
+#requires 10 function evaluations to get an error of 1e-16
 
 #Gauss-Laguerre for I2
 def newf2(u):
-    return f2(u+1)*np.exp(u)
+    return np.pi*np.exp(-2.4)/(2.4)**2
 
-x,w=gq.gaulag(120,0.0)
+x,w=gq.gaulag(300,0.0)
 total=0.0
 for i in range(len(x)):
     total+=newf2(x[i])*w[i]
 print "Gauss-Laguerre: ", total, total-int2[0]
-#requires N=120 to achieve 1e-12 accuracy... but I did a naive implementation by taking f(u) as f1(u).e**u
+#requires N=130 to achieve 1e-12 accuracy... but I did a naive implementation by taking f(u) as f1(u).e**u
 #for the whole interval from 1 to inf. Instead if I consider the asymptotic behaviour it may improve
 
 #Using Romberg
@@ -128,4 +130,4 @@ def newf3(w):
 rombval2=r.qromb(newf3,np.pi/4,np.pi/2,eps=1e-12)
 print rombval2,rombval2[0]-int2[0]
 #Setting 1e-12 accuracy requires 257 function calls and gives 1e-14 error
-#(3.0924507786178475, -1.5258472381249202e-14, 257)
+#(3.0924507786178475, -1.5258472381249302e-14, 257)

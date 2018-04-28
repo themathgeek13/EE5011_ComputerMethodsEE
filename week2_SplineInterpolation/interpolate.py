@@ -1,7 +1,7 @@
 from scipy import *
 from scipy import special
 from matplotlib.pyplot import *
-import weave
+from scipy import weave
 
 def func(x):
 	num=pow(x,1+special.jn(0,x))
@@ -10,7 +10,7 @@ def func(x):
 	return num/den
 
 #define support code
-with open("spline_new.c","r") as f:
+with open("spline_orig.c","r") as f:
 	scode=f.read()
 	
 h=logspace(-4,-2,20)

@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2018-01-12"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>EE5011: Error Analysis and Clenshaw Algorithm</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+EE5011: Error Analysis and Clenshaw Algorithm
+</h1>
+<h2 class="author">
+Rohan Rao, EE14B118
+</h2>
+<h1 class="Section">
+<a class="toc" name="toc-Section-1">1</a> Programming Assignment (Summing Series)
+</h1>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-1.1">1.1</a> Aitken’s <span class="formula"><i>δ</i><sup>2</sup> − <i>process</i></span> 
+</h2>
+<div class="Unindented">
+<div class="formula">
+<i>I</i><sub><i>n</i></sub>(<i>x</i>) = <i>J</i><sub><i>n</i></sub>(<i>jx</i>) = <span class="limits"><sup class="limit">∞</sup><span class="limit">⎲</span><span class="limit">⎳</span><sub class="limit"><i>k</i> = 0</sub></span><span class="fraction"><span class="ignored">(</span><span class="numerator">( − 1)<sup><i>k</i></sup>(<i>jx</i> ⁄ 2)<sup><i>n</i> + 2<i>k</i></sup></span><span class="ignored">)/(</span><span class="denominator"><i>k</i>!(<i>n</i> + <i>k</i>)!</span><span class="ignored">)</span></span> = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>jx</i></span><span class="ignored">)/(</span><span class="denominator">2</span><span class="ignored">)</span></span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><sup><i>n</i></sup><span class="limits"><sup class="limit">∞</sup><span class="limit">⎲</span><span class="limit">⎳</span><sub class="limit"><i>k</i> = 0</sub></span><span class="fraction"><span class="ignored">(</span><span class="numerator">(<i>x</i><sup>2</sup> ⁄ 4)<sup><i>k</i></sup></span><span class="ignored">)/(</span><span class="denominator"><i>k</i>!(<i>k</i> + <i>n</i>)!</span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def kterm(x,k,n):      
+	...:     return (x**2/4.0)**k/(fact(k)*fact(k+n)) 
+​
+def sumn(x,n):  
+     ...:     err=[]                 
+     ...:     s=kterm(x,0,n)*(1j*x/2)**n
+     ...:     for k in range(1,1000):
+     ...:         a=kterm(x,k,n)*(1j*x/2)**n         
+     ...:         err.append(a-kterm(x,k-1,n)*(1j*x/2)**n)
+     ...:         if abs(err[-1])&lt;1e-15:                               
+     ...:             break     
+     ...:         s+=a                              
+     ...:     return s,k+1,np.array(err)
+​
+def calcAxn(x2,x1,x0):
+     ...:     return x2-((x2-x1)**2/((x2-x1)-(x1-x0)))
+​
+def aitken(x,n): 
+     ...:     ax=[]; psum=[]; err=[]                 
+     ...:     psum.append(part(x,0,n)) 
+     ...:     for k in range(1,100): 
+     ...:         psum.append(psum[-1]+part(x,k,n))
+     ...:         if(len(psum)&gt;=3):                      
+     ...:             ax.append(calcAxn(psum[-1],psum[-2],psum[-3]))
+     ...:         if(len(ax)&gt;2):
+     ...:             err.append(abs(ax[-1]-ax[-2]))
+     ...:             if err[-1]&lt;1e-15: 
+     ...:                 break
+     ...:             
+     ...:     return np.array(err)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Here, kterm defines the term after the summation symbol in the final formula on the RHS. This is used directly in the sumn function to evaluate the sum until the errror is below a tolerance (chosen at random) to be <span class="formula">10<sup> − 15</sup>.</span> The calcAxn function uses the Aitken <span class="formula"><i>δ</i><sup>2</sup></span> method by considering three partial sum terms at a time to obtain an accelerated convergence. The plot of the convergence of error of the above two methods is as shown below.
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_1.png" alt="figure figure_1.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The curve on top is that of the direct summation, whereas the curve below it is the result of the Aitken method. This graph was evaluated for the value of x=6.1 and n=20. This gives a value of <span class="formula">3.092897418*10<sup> − 9</sup></span>. The value was compared with the one obtained from scipy.special.jn and is accurate.
+</div>
+<h1 class="Section">
+<a class="toc" name="toc-Section-2">2</a> Euler’s transformation
+</h1>
+<div class="Unindented">
+<div class="formula">
+<span class="limits"><sup class="limit">∞</sup><span class="limit">⎲</span><span class="limit">⎳</span><sub class="limit"><i>n</i> = 1</sub></span>( − 1)<sup><i>n</i></sup><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>x</i><sup><i>n</i></sup></span><span class="ignored">)/(</span><span class="denominator"><i>n</i></span><span class="ignored">)</span></span> =  − <i>ln</i>(1 + <i>x</i>)
+</div>
+
+</div>
+<div class="Indented">
+Euler’s transformation is intended to be applied to an alternating series, as follows:
+</div>
+<div class="Indented">
+<div class="formula">
+<span class="limits"><sup class="limit">∞</sup><span class="limit">⎲</span><span class="limit">⎳</span><sub class="limit"><i>n</i> = 0</sub></span>( − 1)<sup><i>n</i></sup><i>a</i><sub><i>n</i></sub> = <span class="limits"><sup class="limit">∞</sup><span class="limit">⎲</span><span class="limit">⎳</span><sub class="limit"><i>n</i> = 0</sub></span>( − 1)<sup><i>n</i></sup><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>∆</i><sup><i>n</i></sup><i>a</i><sub>0</sub></span><span class="ignored">)/(</span><span class="denominator">2<sup><i>n</i> + 1</sup></span><span class="ignored">)</span></span>
+</div>
+
+</div>
+<div class="Indented">
+where <span class="formula"><i>∆</i></span> is the forward difference operator:
+</div>
+<div class="Indented">
+<div class="formula">
+<i>∆</i><sup><i>n</i></sup><i>a</i><sub>0</sub> = <span class="limits"><sup class="limit"><i>n</i></sup><span class="limit">⎲</span><span class="limit">⎳</span><sub class="limit"><i>k</i> = 0</sub></span>( − 1)<sup><i>k</i></sup><span class="symbol">(</span><span class="scripts"><sup class="script"><i>n</i></sup><sub class="script"><i>k</i></sub></span><span class="symbol">)</span><i>a</i><sub><i>n</i> − <i>k</i></sub>
+</div>
+
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def xterm(x,n):       
+     ...:     return (-x)**n/n
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The above function returns the n-th term of the series to be summed.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"> def neglnx(y):        
+     ...:     s=xterm(y,1);i=2
+     ...:     val=xterm(y,1)
+     ...:     while i&lt;1e10:
+     ...:         if abs(val-xterm(y,i))&lt;1e-15:
+     ...:             break
+     ...:         val=xterm(y,i)
+     ...:         s+=val
+     ...:         i+=1
+     ...:     return s,i
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This function directly sums the series upto a tolerance of <span class="formula">10<sup> − 15</sup></span>.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def fwdiff(x,n):
+     ...:     s=0            
+     ...:     for k in range(n):
+     ...:        s+=(-1)**k*an(x,n-k)*scipy.misc.comb(n,k)/2**(n+1)
+     ...:     return s 
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This is the forward difference function as defined above, but modified to exclude k=n, since that would result in a divide-by-zero operation due to the nature of <span class="formula"><i>a</i><sub><i>n</i></sub></span>.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def Euler(x):   
+     ...:     s=fwdiff(x,0)/2
+     ...:     val=s             
+     ...:     for i in range(1,100000):                            
+     ...:         val2=(-1)**i*fwdiff(x,i)
+     ...:         if(abs(val2-val)&lt;1e-15):
+     ...:             break
+     ...:         s+=val
+     ...:         val=val2
+     ...:     return s,i+1
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Finally, this function sums the Euler transformed series, as defined above, to a tolerance of <span class="formula">10<sup> − 15</sup></span>. The plots are as shown below:
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_2-1.png" alt="figure figure_2-1.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+It can be seen that the direct summing method dominates up until x=0.5, after which the Euler transformation is significantly better than the direct summation method.
+</div>
+<div class="Indented">
+<img class="embedded" src="figure_2-2.png" alt="figure figure_2-2.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+For x&lt;0, it can be seen that the direct summation method is better than the Euler transformation method.
+</div>
+<h1 class="Section">
+<a class="toc" name="toc-Section-3">3</a> Quadratic Equation
+</h1>
+<h1 class="Section">
+<a class="toc" name="toc-Section-4">4</a> Stable and unstable series
+</h1>
+<div class="Unindented">
+The series to be summed is as follows:
+</div>
+<div class="Indented">
+<div class="formula">
+<i>S</i>(<i>x</i>) = <span class="limits"><sup class="limit">40</sup><span class="limit">⎲</span><span class="limit">⎳</span><sub class="limit"><i>n</i> = 0</sub></span><span class="fraction"><span class="ignored">(</span><span class="numerator">1</span><span class="ignored">)/(</span><span class="denominator"><i>n</i> + 1</span><span class="ignored">)</span></span><i>J</i><sub><i>n</i></sub>(<i>x</i>)
+</div>
+
+</div>
+<div class="Indented">
+The function <span class="formula"><i>J</i><sub><i>n</i></sub>(<i>x</i>)</span> is the <span class="formula"><i>n</i><sup><i>th</i></sup></span> term of the Bessel series.
+</div>
+<div class="Indented">
+A Python function to compute the sum (exact solution) is as follows:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">from scipy.special import jn
+​
+def S(x,num):
+	total=0
+	for i in range(num+1):
+		total+=jn(i,x)/(i+1)
+	return total
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This gives the exact value of S(1.5,40) = 0.88608893929096932 and S(15,40) = 0.12377300077343459.
+</div>
+<div class="Indented">
+The recursion formula for the Bessel-like functions is as follows:
+</div>
+<div class="Indented">
+<div class="formula">
+<i>Z</i><sub><i>n</i></sub>(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator">2(<i>n</i> − 1)</span><span class="ignored">)/(</span><span class="denominator"><i>x</i></span><span class="ignored">)</span></span><i>Z</i><sub><i>n</i> − 1</sub>(<i>x</i>) − <i>Z</i><sub><i>n</i> − 2</sub>(<i>x</i>)
+</div>
+
+</div>
+<div class="Indented">
+where <span class="formula"><i>Z</i><sub><i>n</i></sub>(<i>x</i>)</span> is either <span class="formula"><i>J</i><sub><i>n</i></sub>(<i>x</i>)</span> or <span class="formula"><i>Y</i><sub><i>n</i></sub>(<i>x</i>)</span> or a linear combination of the two.
+</div>
+<div class="Indented">
+For computing the series using a forward recursion, we can use the initial condition of <span class="formula"><i>J</i><sub> − 1</sub>(<i>x</i>) = 0</span> and <span class="formula"><i>J</i><sub>0</sub>(<i>x</i>)</span> obtained from scipy.special.jn. Then we can use these in a loop with dynamic programming to obtain the two sequences for x=1.5 and x=15.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">vals1p5=[0,jn(0,1.5)]
+for i in range(50):
+	vals1p5.append(vals1p5[-1]*2*i/1.5-vals1p5[-2])
+del vals1p5[0]
+vals15=[0,jn(0,15)]
+for i in range(50):
+	vals15.append(vals15[-1]*2*i/15-vals15[-2])
+del vals15[0]
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The above two sequences obtained from forward recursion can be used to calculate the sum of the above series, with the error being checked at every stage.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">n=np.array(range(41))
+fwd15=abs(np.cumsum(vals15/(n+1)))
+fwd1p5=abs(np.cumsum(vals1p5/(n+1)))
+err1p5=s1(1.5,n)-fwd1p5[:41]
+err15=s1(15,n)-fwd15[:41]
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The plots obtained are as follows:
+</div>
+<div class="Indented">
+<img class="embedded" src="xval1p5.png" alt="figure xval1p5.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+Error grows exponentially (semilog scale) for n ~ 3.
+</div>
+<div class="Indented">
+<img class="embedded" src="xval15.png" alt="figure xval15.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+Error grows exponentially beyond n ~ 18.
+</div>
+<div class="Indented">
+This shows that the series is unstable for forward recursion when n &gt; x. The different values of x=1.5 and x=15 show the variation in the error plot as above.
+</div>
+<div class="Indented">
+Using the following recursion for reversed calculation:
+</div>
+<div class="Indented">
+<div class="formula">
+<i>Z</i><sub><i>n</i></sub>(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator">2(<i>n</i> + 1)</span><span class="ignored">)/(</span><span class="denominator"><i>x</i></span><span class="ignored">)</span></span><i>Z</i><sub><i>n</i> + 1</sub>(<i>x</i>) − <i>Z</i><sub><i>n</i> + 2</sub>(<i>x</i>)
+</div>
+
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">vals1p5=[0,1] #J61, J60
+for i in range(60):
+	vals1p5.append(2*(60-i)*vals1p5[-1]/1.5-vals1p5[-2])
+​
+vals15=[0,1]
+for i in range(60):
+	vals15.append(2*(60-i)*vals15[-1]/15.0-vals15[-2])
+​
+#NORMALIZE
+vals15=np.array(vals15)
+vals15/=vals15[-1]
+vals1p5=np.array(vals1p5)
+vals1p5/=vals1p5[-1]
+​
+#Reverse
+vals1p5=vals1p5[::-1][:41]
+vals15=vals15[::-1][:41]
+​
+n=np.array(range(41))
+fwd15=abs(np.cumsum(vals15/(n+1)))
+fwd1p5=abs(np.cumsum(vals1p5/(n+1)))
+err1p5=s1(1.5,n)-fwd1p5[:41]
+err15=s1(15,n)-fwd15[:41]
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The plots obtained are as follows:
+</div>
+<div class="Indented">
+<img class="embedded" src="err1p5_rev.png" alt="figure err1p5_rev.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+<img class="embedded" src="err15_rev.png" alt="figure err15_rev.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+This shows that using the reverse recursion for obtaining the series sum can significantly reduce the error, and keep the series stable.
+</div>
+<h2 class="Subsection">
+<a class="toc" name="toc-Subsection-4.1">4.1</a> Clenshaw Algorithm
+</h2>
+<div class="Unindented">
+The Clenshaw algorithm implemented in Python, is as follows:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">#Clenshaw Algorithm:
+#S(x)=sum(0 to n, c_k*F_k(x))
+#F_(n+1)(x)=alpha(n,x)*F_n(x)+beta(n,x)*F_(n-1)(x)
+import numpy as np
+import scipy.special
+​
+def alpha(i,x):
+    #return x/(2*(i+1))
+    return 2*x
+​
+def beta(i,x):
+    #return x**2/(2*(i+1)*i)
+    return -1
+​
+def F(i,x):
+    if(i==0):
+        return 1
+    if(i==1):
+        return x
+​
+def a(i):
+    return coeff[i]
+    #return 1
+​
+def S(F,alpha,beta,a,x,n):
+    b=np.zeros(n+3)
+    b[-1]=b[-2]=0
+    for i in range(n,0,-1):
+        b[i]=a(i)+alpha(i,x)*b[i+1]+beta(i+1,x)*b[i+2]
+    return F(0,x)*a(0)+F(1,x)*b[1]+beta(1,x)*F(0,x)*b[2]
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Using the Chebyshev sum for <span class="formula"><i>e</i><sup><i>x</i></sup></span> requires the Chebyshev coefficients, which can be calculated using the procedure below:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def chebfit(xdata,ydata,x):
+     ...:     n=len(xdata)
+     ...:     xmax=max(xdata)
+     ...:     xmin=min(xdata)
+     ...:     xdata=(2*xdata-xmax-xmin)/(xmax-xmin)
+     ...:     T=np.zeros((n,n))
+     ...:     T[:,0]=1
+     ...:     T[:,1]=xdata
+     ...:     for j in range(2,n):
+     ...:         T[:,j]=2*xdata*T[:,j-1]-T[:,j-2]
+     ...:     b=np.dot(np.linalg.inv(T),ydata)
+     ...:     x=(2*x-xmax-xmin)/(xmax-xmin)
+     ...:     y=np.zeros(len(x))
+     ...:     for j in range(n):
+     ...:         y=y+b[j]*cos((j-1)*arccos(x));
+     ...:     return y,b
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This can also be computed using the np.polynomial.chebyshev.chebfit function in Numpy.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">coeff=np.polynomial.chebyshev.chebfit(x,y,20)
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The coefficients can then be used to obtain the function by using the Chebyshev recursive formula:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">def chebpoly(n,x):
+     ...:     if(n==0):         
+     ...:         return 1      
+     ...:     if(n==1):         
+     ...:         return x
+     ...:     return 2*x*chebpoly(n-1,x)-chebpoly(n-2,x)
+​
+def chebapproxfn(coeff,x):
+     ...:     n=len(coeff)      
+     ...:     s=0               
+     ...:     for i in range(n):
+     ...:         s+=coeff[i]*chebpoly(i,x)
+     ...:     return s
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The error obtained using this direct method is of the order of <span class="formula">10<sup> − 14</sup>.</span>
+</div>
+<div class="Indented">
+<img class="embedded" src="epowx.png" alt="figure epowx.png" style="max-width: 640px; max-height: 472px;"/>
+
+</div>
+<div class="Indented">
+Upon using the Clenshaw algorithm, the following plot is obtained.
+</div>
+<div class="Indented">
+<img class="embedded" src="clenshaw.png" alt="figure clenshaw.png" style="max-width: 640px; max-height: 480px;"/>
+
+</div>
+<div class="Indented">
+The spaces are where the error is zero, so log(error) is not defined.
+</div>
+<div class="Indented">
+This shows that the Clenshaw algorithm gives an error that is better than the direct sum obtained from above.
+</div>
+<div class="Indented">
+The mean and standard deviation of the plots above is as follows:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">Direct Sum:
+mean = 3.835e-15
+std = 1.044e-14
+​
+Clenshaw Sum:
+mean = 1.141e-15
+std = 8.393e-16
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Clearly, the Clenshaw sum has a 3 times lower mean and an order of magnitude better standard deviation. In the case of the series S(x), it doesn’t matter for the Clenshaw algorithm whether it is stable in forward or backward direction. So I will use the forward series to ensure it works.
+</div>
+<div class="Indented">
+<div class="formula">
+<i>Z</i><sub><i>n</i> + 1</sub>(<i>x</i>) = <span class="fraction"><span class="ignored">(</span><span class="numerator">2<i>n</i></span><span class="ignored">)/(</span><span class="denominator"><i>x</i></span><span class="ignored">)</span></span><i>Z</i><sub><i>n</i></sub>(<i>x</i>) − <i>Z</i><sub><i>n</i> − 1</sub>(<i>x</i>)
+</div>
+
+</div>
+<div class="Indented">
+When I tried the same Clenshaw algorithm for this series, it was giving the wrong answer, and I think something is wrong.
+</div>
+
+</div>
+</body>
+</html>

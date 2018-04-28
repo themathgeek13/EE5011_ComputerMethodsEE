@@ -1,27 +1,31 @@
 #Clenshaw Algorithm:
-#S(x)=sum(0 to n, a_k*phi_k(x))
-#phi_(k+1)(x)=alpha_k(x)*phi_k(x)+beta_k(x)*phi_(k-1)(x)
+#S(x)=sum(0 to n, c_k*F_k(x))
+#F_(n+1)(x)=alpha(n,x)*F_n(x)+beta(n,x)*F_(n-1)(x)
 import numpy as np
 import scipy.special
 
 def alpha(i,x):
-    return 2*x
+    #return x/(2*(i+1))
+    return 2*i/x
 
 def beta(i,x):
+    #return x**2/(2*(i+1)*i)
     return -1
 
-def phi(i,x):
+def F(i,x):
     if(i==0):
-        return 1
+        return scipy.special.jn(0,x)
     if(i==1):
-        return x
+        return scipy.special.jn(1,x)
 
 def a(i):
-    return coeff[i]
+    #return coeff[i]
+    return 1/(i+1)
 
-def S(phi,alpha,beta,a,x,n):
-    b=np.zeros(n+2)
+def S(F,alpha,beta,a,x,n):
+    b=np.zeros(n+3)
     b[-1]=b[-2]=0
-    for i in range(n-1,-1,-1):
+    for i in range(n,0,-1):
         b[i]=a(i)+alpha(i,x)*b[i+1]+beta(i+1,x)*b[i+2]
-    return phi(0,x)*a(0)+phi(1,x)*b[0]+beta(1,x)*phi(0,x)*b[1]
+    print(F(0,x)*a(0), F(1,x)*b[1], beta(1,x)*F(0,x)*b[2])
+    return F(0,x)*a(0)+F(1,x)*b[1]+beta(1,x)*F(0,x)*b[2]
